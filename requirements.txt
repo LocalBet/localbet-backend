@@ -1,0 +1,17 @@
+# Remember to add the package, its single version and the documentation page
+# Try to add as many dependencies as possible in the constraints.txt file, of the packages you are using
+
+# pydantic-settings is part of the Pydantic ecosystem and is used for managing application settings.
+pydantic-settings==2.7.1  # https://docs.pydantic.dev/latest/concepts/pydantic_settings
+
+# typing-extensions provides additional type hints and features for Python's typing module.
+typing-extensions>=4.4.0 # https://pypi.org/project/typing-extensions/
+
+# psycopg is a PostgreSQL adapter for Python.
+psycopg[pool, binary]==3.2.6 # https://github.com/psycopg/psycopg
+
+# fastapi is a modern web framework for building APIs with Python.
+fastapi==0.115.6  # https://fastapi.tiangolo.com
+
+# uvicorn is an ASGI server for running FastAPI applications.
+uvicorn==0.32.1  # https://www.uvicorn.org

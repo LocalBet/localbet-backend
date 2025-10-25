@@ -1,0 +1,8 @@
+# Directories to ignore
+**.vscode**
+**.venv**
+.env
+app.conf
+**topics**
+**pycache**
+**logs**
