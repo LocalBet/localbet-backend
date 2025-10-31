@@ -11,7 +11,7 @@ from psycopg import Connection, sql
 from psycopg.sql import SQL, Composed
 
 from backend.shared.infrastructure.errors import NoRowAffectedError
-from backend.shared.models import DataModel
+from backend.shared.models.data_model import DataModel
 
 T = TypeVar("T", bound=DataModel)
 

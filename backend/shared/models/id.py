@@ -2,9 +2,8 @@
 Identifier module.
 """
 
-from uuid import UUID
-
 from typing_extensions import override
+from uuid import UUID
 
 from backend.shared.errors import IDError
 

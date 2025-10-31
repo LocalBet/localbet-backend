@@ -1,3 +1,4 @@
+from .user_already_exists_error import UserAlreadyExistsError
 from .user_email_errors import (
     UserEmailMaxLengthError,
     UserEmailMinLengthError,
@@ -10,6 +11,7 @@ from .user_name_errors import (
     UserNameMinLengthError,
     UserNameTypeError,
 )
+from .user_not_found_error import UserNotFoundError
 from .user_password_errors import (
     UserPasswordContainsInvalidCharactersError,
     UserPasswordMaxLengthError,
@@ -17,6 +19,7 @@ from .user_password_errors import (
     UserPasswordMismatchError,
     UserPasswordTypeError,
 )
+from .user_update_password_error import UserUpdatePasswordError
 from .user_username_errors import (
     UserUsernameContainsInvalidCharactersError,
     UserUsernameMaxLengthError,
@@ -26,6 +29,7 @@ from .user_username_errors import (
 )
 
 __all__ = (
+    "UserAlreadyExistsError",
     "UserEmailMaxLengthError",
     "UserEmailMinLengthError",
     "UserEmailNoneCorrectFormatError",
@@ -34,11 +38,13 @@ __all__ = (
     "UserNameMaxLengthError",
     "UserNameMinLengthError",
     "UserNameTypeError",
+    "UserNotFoundError",
     "UserPasswordContainsInvalidCharactersError",
     "UserPasswordMaxLengthError",
     "UserPasswordMinLengthError",
     "UserPasswordMismatchError",
     "UserPasswordTypeError",
+    "UserUpdatePasswordError",
     "UserUsernameContainsInvalidCharactersError",
     "UserUsernameMaxLengthError",
     "UserUsernameMinLengthError",

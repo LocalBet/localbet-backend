@@ -3,20 +3,19 @@ User domain model.
 """
 
 from datetime import datetime
+from typing_extensions import override
 from uuid import UUID
 
-from typing_extensions import override
-
 from backend.shared.models import DataModel
-from backend.users.models import (
-    UserCreatedDate,
-    UserEmail,
-    UserId,
-    UserName,
-    UserPassword,
-    UserUpdatedDate,
-    UserUsername,
-)
+
+from .user_create_date import UserCreatedDate
+from .user_email import UserEmail
+from .user_id import UserId
+from .user_name import UserName
+from .user_password import UserPassword
+from .user_role_id import UserRoleId
+from .user_update_date import UserUpdatedDate
+from .user_username import UserUsername
 
 
 class User(DataModel):
@@ -28,9 +27,13 @@ class User(DataModel):
     __name: UserName
     __username: UserUsername
     __email: UserEmail
+    __role_id: UserRoleId
     __password: UserPassword
-    __created_date: UserCreatedDate
-    __updated_date: UserUpdatedDate
+    __create_date: UserCreatedDate
+    __update_date: UserUpdatedDate
+
+    # It's necessary to redefine __hash__ because __eq__ is overridden
+    __hash__ = DataModel.__hash__
 
     def __init__(
         self,
@@ -39,8 +42,9 @@ class User(DataModel):
         username: str,
         email: str,
         password: str,
-        created_date: datetime,
-        updated_date: datetime,
+        role_id: str | UUID,
+        create_date: datetime,
+        update_date: datetime,
     ) -> None:
         """
         User domain model constructor.
@@ -51,16 +55,17 @@ class User(DataModel):
             username (str): User username.
             email (str): User email.
             password (str): User password.
-            created_date (datetime): User created date.
-            updated_date (datetime): User updated date.
+            create_date (datetime): User created date.
+            update_date (datetime): User updated date.
         """
         self.__id = UserId(value=id)
         self.__name = UserName(value=name)
         self.__username = UserUsername(value=username)
         self.__email = UserEmail(value=email)
         self.__password = UserPassword(value=password)
-        self.__created_date = UserCreatedDate(value=created_date)
-        self.__updated_date = UserUpdatedDate(value=updated_date)
+        self.__role_id = UserRoleId(value=role_id)
+        self.__create_date = UserCreatedDate(value=create_date)
+        self.__update_date = UserUpdatedDate(value=update_date)
 
     @override
     def __eq__(self, other: object) -> bool:
@@ -189,31 +194,51 @@ class User(DataModel):
         return self.__password == plain_password
 
     @property
-    def created_date(self) -> datetime:
+    def role_id(self) -> str | UUID:
+        """
+        Returns the user's role id.
+
+        Returns:
+            str | UUID: User role id.
+        """
+        return self.__role_id.value
+
+    @role_id.setter
+    def role_id(self, value: str | UUID) -> None:
+        """
+        Sets the user's role id.
+
+        Args:
+            value (str | UUID): User role id.
+        """
+        self.__role_id = UserRoleId(value=value)
+
+    @property
+    def create_date(self) -> datetime:
         """
         Returns the user's created date as a primitive type.
 
         Returns:
             datetime: User created date.
         """
-        return self.__created_date.value
+        return self.__create_date.value
 
     @property
-    def updated_date(self) -> datetime:
+    def update_date(self) -> datetime:
         """
         Returns the user's updated date as a primitive type.
 
         Returns:
             datetime: User updated date.
         """
-        return self.__updated_date.value
+        return self.__update_date.value
 
-    @updated_date.setter
-    def updated_date(self, value: datetime) -> None:
+    @update_date.setter
+    def update_date(self, value: datetime) -> None:
         """
         Sets the user's updated date.
 
         Args:
             value (datetime): User updated date.
         """
-        self.__updated_date = UserUpdatedDate(value=value)
+        self.__update_date = UserUpdatedDate(value=value)

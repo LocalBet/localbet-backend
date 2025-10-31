@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any
 from uuid import uuid4
 
-from authlib.jose import JsonWebToken, JWTClaims, jwt
+from authlib.jose import JWTClaims, JsonWebToken, jwt
 from pydantic import Field, validate_call
 
 from .jwa import JWTAlgorithm, JWTSymmetricAlgorithm, JWTType
@@ -170,12 +170,15 @@ class JWT:
         payload["nbf"] = int((now + timedelta(seconds=not_before_delta)).timestamp())
 
         if token_id is not None:
-            payload["jti"] = str(object=token_id)
+            payload["jti"] = str(token_id)
 
         header = {}
-        header["alg"] = algorithm
+        header["alg"] = str(algorithm)
 
-        return jwt.encode(header=header, payload=payload, key=secret).decode(encoding="utf-8")
+        token_bytes: Any = jwt.encode(header=header, payload=payload, key=secret) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+        if isinstance(token_bytes, bytes):
+            return token_bytes.decode("utf-8")
+        return str(token_bytes) # pyright: ignore[reportUnknownArgumentType]
 
     @classmethod
     @validate_call

@@ -4,7 +4,6 @@ Base model module.
 
 from datetime import date, datetime
 from typing import Any, Self
-
 from typing_extensions import override
 
 

@@ -14,7 +14,7 @@ class UserEmail(ValueObject[str]):
     """
 
     __USER_EMAIL_MIN_LENGTH: int = 5
-    __USER_EMAIL_MAX_LENGTH: int = 32
+    __USER_EMAIL_MAX_LENGTH: int = 150
 
     @override
     def _validate(self, value: str) -> None:
