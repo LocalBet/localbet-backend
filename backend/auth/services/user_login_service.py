@@ -76,4 +76,4 @@ class UserLoginService:
         References:
             https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#authentication-and-error-messages
         """
-        password_hashing(password=password)
+        password_hashing(data=password)

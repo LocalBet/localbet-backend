@@ -5,6 +5,7 @@ UserPassword value object.
 from typing_extensions import override
 
 from backend.shared.models import ValueObject
+from backend.shared.utils import compare_passwords, password_hashing
 from backend.users.errors import (
     UserPasswordContainsInvalidCharactersError,
     UserPasswordMaxLengthError,
@@ -39,7 +40,10 @@ class UserPassword(ValueObject[str]):
             raise NotImplementedError
 
         if isinstance(other, str):
-            return self._value == other  # TODO: Verify hashed password
+            return compare_passwords(
+                plain_password=other,
+                hashed_password=self._value,
+            )
 
         return self._value == other.value
 
@@ -57,7 +61,7 @@ class UserPassword(ValueObject[str]):
         if value.startswith("$argon2id$v=19$m"):
             return value
 
-        return value  # TODO: Hash password here
+        return password_hashing(data=value)
 
     @override
     def _validate(self, value: str) -> None:

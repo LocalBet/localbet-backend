@@ -22,3 +22,5 @@ pyjwt[crypto]==2.8.0  # https://github.com/jpadilla/pyjwt
 # Authlib is a library for building OAuth and OpenID Connect clients and servers.
 Authlib>=1.0.0,<2.0.0  # https://docs.authlib.org
 
+# argon2-cffi is a library for secure password hashing using the Argon2 algorithm.
+argon2-cffi==25.1.0  # https://argon2-cffi.readthedocs.io/en/stable

@@ -1,5 +1,6 @@
-from .password_hasing import password_hashing
+from .password_hasing import compare_passwords, password_hashing
 
 __all__ = [
+    'compare_passwords',
     'password_hashing',
 ]
