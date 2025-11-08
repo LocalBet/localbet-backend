@@ -26,7 +26,6 @@ class UserGetSchema(BaseModel):
 
     role_id: str | UUID = Field(
         default=...,
-        serialization_alias='roleId',
         description='User role identifier',
         examples=['3fa85f64-5717-4562-b3fc-29601a5f462'],
     )
