@@ -9,6 +9,7 @@ pytest-asyncio>=0.0.0,<1.0.0  # https://pytest-asyncio.readthedocs.io
 pytest-xdist[psutil]>=3.6.1,<4.0.0  # https://pytest-xdist.readthedocs.io/en
 pytest-randomly>=3.0.0,<4.0.0  # https://github.com/pytest-dev/pytest-randomly
 coverage[toml]>=7.0.0,<8.0.0  # https://coverage.readthedocs.io
+pytest-cov==7.0.0  # https://pytest-cov.readthedocs.io/en/latest/
 
 # Linting and static analysis tools
 ruff>=0.0.0,<1.0.0  # https://docs.astral.sh/ruff
@@ -18,3 +19,6 @@ bandit>=1.0.0,<2.0.0  # https://bandit.readthedocs.io
 
 # Pre-commit hooks management
 pre-commit>=3.0.0,<5.0.0  # https://pre-commit.com
+
+# Test data generation
+Faker==37.12.0  # https://faker.readthedocs.io/en/master/

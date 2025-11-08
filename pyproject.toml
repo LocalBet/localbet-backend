@@ -1,0 +1,41 @@
+[tool.pytest.ini_options]
+asyncio_mode = 'auto'
+pythonpath = '.'
+addopts = [
+    '--color=yes',      # color the output
+    '-n=auto',          # run tests in parallel
+]
+markers = [
+    'unit_testing: Check a unique funtionality',
+    'integration_testing: Check the integration between two or more functions',
+    'e2e_testing: Check the end to end functionality of the application',
+    'performance_testing: Check the performance of the application',
+    'security_testing: Check the security of the application',
+]
+xfail_strict = true
+asyncio_default_fixture_loop_scope = 'function'
+
+
+[tool.coverage.run]
+source = ['backend']
+parallel = true
+branch = true
+relative_files = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 2
+exclude_lines = [
+    'pragma: no cover',
+    'raise NotImplementedError',
+    'if TYPE_CHECKING:',
+    'if typing.TYPE_CHECKING:',
+    '@overload',
+    '@typing.overload',
+    'typing.assert_never',
+    'assert_never',
+]
+
+[tool.coverage.paths]
+source = ['backend']
