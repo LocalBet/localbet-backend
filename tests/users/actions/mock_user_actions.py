@@ -30,7 +30,6 @@ class MockUserActions(UserActions):
         MockUserActions constructor.
         """
         self.__search_mock = Mock()
-        self.__match_mock = Mock()
         self.__save_mock = Mock()
         self.__update_mock = Mock()
         self.__delete_mock = Mock()
