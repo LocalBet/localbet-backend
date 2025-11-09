@@ -18,7 +18,7 @@ class UserLoginService:
     """
 
     __actions: UserActions
-    __finder: UserFinderService
+    __user_finder: UserFinderService
 
     def __init__(self, actions: UserActions, finder: UserFinderService) -> None:
         """
@@ -29,7 +29,7 @@ class UserLoginService:
             finder (UserFinderService): User finder service.
         """
         self.__actions = actions
-        self.__finder = finder
+        self.__user_finder = finder
 
     def login(self, email: str, password: str) -> tuple[str, str]:
         """
@@ -46,7 +46,7 @@ class UserLoginService:
         Returns:
             tuple[str, str]: The access and refresh tokens.
         """
-        users: list[User] = self.__finder.find(
+        users: list[User] = self.__user_finder.find(
             conditions=[Condition(
                 field='email',
                 operator=SQLOperation.EQUAL,
