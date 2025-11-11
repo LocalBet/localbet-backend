@@ -5,7 +5,7 @@ UserEmail value object.
 from typing_extensions import override
 
 from backend.shared.models import ValueObject
-from backend.users.errors import UserEmailTypeError
+from backend.users.errors import UserEmailMaxLengthError, UserEmailMinLengthError, UserEmailTypeError
 
 
 class UserEmail(ValueObject[str]):
@@ -34,8 +34,8 @@ class UserEmail(ValueObject[str]):
             raise UserEmailTypeError(email=value)
 
         if len(value) < self.__USER_EMAIL_MIN_LENGTH:
-            raise UserEmailTypeError(email=value)
+            raise UserEmailMinLengthError(email=value, min_length=self.__USER_EMAIL_MIN_LENGTH)
 
         if len(value) > self.__USER_EMAIL_MAX_LENGTH:
-            raise UserEmailTypeError(email=value)
+            raise UserEmailMaxLengthError(max_length=self.__USER_EMAIL_MAX_LENGTH)
 
