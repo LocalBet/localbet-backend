@@ -31,3 +31,16 @@ class WordMother(BaseMother):
             Any: Invalid word type.
         """
         return cls._invalid_type(remove_types={str})
+
+    @classmethod
+    def of_length(cls, length: int) -> str:
+        """
+        Create a word of the given length.
+
+        Args:
+            length (int): Word length.
+
+        Returns:
+            str: Word of the given length.
+        """
+        return 'a' * length

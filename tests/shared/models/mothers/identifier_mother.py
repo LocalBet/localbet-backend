@@ -43,7 +43,7 @@ class IdentifierMother(BaseMother):
         Returns:
             str: Invalid identifier value.
         """
-        values = [
+        values: list[str | int] = [
             randint(a=0, b=100),  # noqa: S311  # nosec
             'a' * randint(a=1, b=100),  # noqa: S311  # nosec
             ' ' * randint(a=1, b=10),  # noqa: S311  # nosec

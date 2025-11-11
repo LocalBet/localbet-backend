@@ -70,11 +70,15 @@ class UsernameMother(BaseMother):
     @classmethod
     def invalid_value(cls) -> str:
         """
-        Create an invalid username value.
+        Create an invalid username value. Includes non-printable characters.
+        Included space, dot, at symbol, hyphen, and other special characters are
+        tested in other methods.
 
         Returns:
             str: Invalid username value.
         """
-        non_printable_chars = ''.join(chr(i) for i in range(32))
+        non_printable_chars = ''.join(chr(i) for i in range(33))
 
         return ''.join(choice(seq=non_printable_chars) for _ in range(10))  # noqa: S311  # nosec
+
+

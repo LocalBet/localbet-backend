@@ -2,6 +2,8 @@
 Test user update domain service.
 """
 
+from datetime import UTC, datetime
+
 from pytest import mark, raises as assert_raises
 
 from backend.auth.errors import PasswordVerificationError
@@ -28,9 +30,12 @@ def test_user_update_username() -> None:
     user = UserMother.create()
     new_username = UserUsernameMother.of_length(length=4)
 
+    before_update = datetime.now(tz=UTC)
     user_update_service.update(user=user, username=new_username)
+    after_update = datetime.now(tz=UTC)
 
     assert user.username == new_username
+    assert before_update <= user.update_date <= after_update
     user_actions.assert_update_method_called(user=user)
 
 
@@ -62,9 +67,12 @@ def test_user_update_email() -> None:
     user = UserMother.create()
     new_email = f"{WordMother.random()}@example.com"
 
+    before_update = datetime.now(tz=UTC)
     user_update_service.update(user=user, email=new_email)
+    after_update = datetime.now(tz=UTC)
 
     assert user.email == new_email
+    assert before_update <= user.update_date <= after_update
     user_actions.assert_update_method_called(user=user)
 
 
@@ -79,9 +87,12 @@ def test_user_update_name() -> None:
     user = UserMother.create()
     new_name = UserNameMother.of_length(length=4)
 
+    before_update = datetime.now(tz=UTC)
     user_update_service.update(user=user, name=new_name)
+    after_update = datetime.now(tz=UTC)
 
     assert user.name == new_name
+    assert before_update <= user.update_date <= after_update
     user_actions.assert_update_method_called(user=user)
 
 @mark.unit_testing
@@ -113,14 +124,17 @@ def test_user_update_password() -> None:
     user = UserMother.create(password=old_password)
     new_password = UserPasswordMother.random()
 
+    before_update = datetime.now(tz=UTC)
     user_update_service.update(
         user=user,
         old_password=old_password,
         new_password=new_password,
         new_password_confirmation=new_password,
     )
+    after_update = datetime.now(tz=UTC)
 
     assert user.check_password(plain_password=new_password)
+    assert before_update <= user.update_date <= after_update
     user_actions.assert_update_method_called(user=user)
 
 
@@ -202,11 +216,14 @@ def test_user_update_multiple_fields() -> None:
     new_email = EmailMother.random()
     new_name = WordMother.random()
 
+    before_update = datetime.now(tz=UTC)
     user_update_service.update(user=user, username=new_username, email=new_email, name=new_name)
+    after_update = datetime.now(tz=UTC)
 
     assert user.username == new_username
     assert user.email == new_email
     assert user.name == new_name
+    assert before_update <= user.update_date <= after_update
     user_actions.assert_update_method_called(user=user)
 
 

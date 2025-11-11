@@ -27,3 +27,40 @@ class UserEmailMother(EmailMother):
             value = cls.random(domain=domain)
 
         return UserEmail(value=value)
+
+    @classmethod
+    def with_subdomain(cls) -> UserEmail:
+        """
+        Create a user email with a subdomain.
+
+        Returns:
+            UserEmail: User email with subdomain.
+        """
+        email = cls.random(domain="mail.example.com")
+        return UserEmail(value=email)
+
+    @classmethod
+    def with_plus_sign(cls) -> UserEmail:
+        """
+        Create a user email with a plus sign.
+
+        Returns:
+            UserEmail: User email with plus sign.
+        """
+        local_part = cls._faker().user_name() + "+tag"
+        domain = "example.com"
+        email = f"{local_part}@{domain}"
+        return UserEmail(value=email)
+
+    @classmethod
+    def with_dots_in_local_part(cls) -> UserEmail:
+        """
+        Create a user email with dots in the local part.
+
+        Returns:
+            UserEmail: User email with dots in local part.
+        """
+        local_part = "first.last"
+        domain = "example.com"
+        email = f"{local_part}@{domain}"
+        return UserEmail(value=email)
