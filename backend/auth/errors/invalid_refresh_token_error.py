@@ -14,4 +14,4 @@ class InvalidRefreshTokenError(InvalidCredentialsError):
         """
         InvalidRefreshTokenError constructor.
         """
-        super().__init__(message='The provided refresh token is invalid.')
+        super().__init__(message="The provided refresh token is invalid.")

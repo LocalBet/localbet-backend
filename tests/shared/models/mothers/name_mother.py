@@ -36,7 +36,7 @@ class NameMother(BaseMother):
         Returns:
             str: Person name of the given length.
         """
-        return 'a' * length
+        return "a" * length
 
     @classmethod
     def invalid_type(cls) -> Any:
@@ -56,6 +56,6 @@ class NameMother(BaseMother):
         Returns:
             str: Invalid name value.
         """
-        non_printable_chars = ''.join(chr(i) for i in range(32))
+        non_printable_chars = "".join(chr(i) for i in range(32))
 
-        return ''.join(choice(seq=non_printable_chars) for _ in range(10))  # noqa: S311  # nosec
+        return "".join(choice(seq=non_printable_chars) for _ in range(10))  # noqa: S311  # nosec

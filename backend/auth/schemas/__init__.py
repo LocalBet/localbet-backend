@@ -5,9 +5,9 @@ from .refresh_token_schema import RefreshTokenSchema
 from .user_created_schema import UserCreatedSchema
 
 __all__ = (
-    'AccessTokenSchema',
-    'CreateUserSchema',
-    'LoginSchema',
-    'RefreshTokenSchema',
-    'UserCreatedSchema',
+    "AccessTokenSchema",
+    "CreateUserSchema",
+    "LoginSchema",
+    "RefreshTokenSchema",
+    "UserCreatedSchema",
 )

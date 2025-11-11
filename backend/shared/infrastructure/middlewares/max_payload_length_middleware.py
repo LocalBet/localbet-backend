@@ -46,9 +46,9 @@ class MaxPayloadLengthMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 content={
-                    'error': {
-                        'title': 'Payload Too Large',
-                        'message': f'Payload exceeds the maximum size of {self.__MAX_PAYLOAD_LENGTH / (1024)} KB.',
+                    "error": {
+                        "title": "Payload Too Large",
+                        "message": f"Payload exceeds the maximum size of {self.__MAX_PAYLOAD_LENGTH / (1024)} KB.",
                     }
                 },
             )

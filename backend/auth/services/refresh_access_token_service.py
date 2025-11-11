@@ -2,7 +2,6 @@
 Refresh user access token domain service.
 """
 
-
 from backend.auth.errors import InvalidRefreshTokenError
 from backend.auth.models import AccessToken, RefreshToken
 from backend.shared.models import Condition, DataModel, SQLOperation
@@ -69,15 +68,13 @@ class RefreshAccessTokenService:
         Returns:
             User: The user. None if the user is not found.
         """
-        conditions: list[Condition[DataModel]] = [Condition[DataModel](
-                            field='id',
-                            operator=SQLOperation.EQUAL,
-                            value=user_id
-        )]
+        conditions: list[Condition[DataModel]] = [
+            Condition[DataModel](field="id", operator=SQLOperation.EQUAL, value=user_id)
+        ]
 
         users: list[User] = self.__user_finder.find(conditions=conditions)
         if users and len(users) > 1:
-            raise UserNotFoundError(field='id', value=user_id)
+            raise UserNotFoundError(field="id", value=user_id)
         elif users:
             return users[0]
         else:

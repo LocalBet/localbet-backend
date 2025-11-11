@@ -95,6 +95,7 @@ def test_user_update_name() -> None:
     assert before_update <= user.update_date <= after_update
     user_actions.assert_update_method_called(user=user)
 
+
 @mark.unit_testing
 def test_user_update_name_with_invalid_value() -> None:
     """
@@ -240,4 +241,3 @@ def test_user_update_no_changes() -> None:
     user_update_service.update(user=user)
 
     user_actions.assert_update_method_not_called()
-

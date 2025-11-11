@@ -14,4 +14,4 @@ class InvalidAccessTokenError(InvalidCredentialsError):
         """
         InvalidAccessTokenError constructor.
         """
-        super().__init__(message='The provided access token is invalid.')
+        super().__init__(message="The provided access token is invalid.")

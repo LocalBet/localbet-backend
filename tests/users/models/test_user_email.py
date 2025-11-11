@@ -34,6 +34,7 @@ def test_user_email_with_mother() -> None:
     assert "@" in user_email.value
     assert "." in user_email.value.split("@")[-1]
 
+
 @mark.unit_testing
 def test_user_email_too_short() -> None:
     """
@@ -54,6 +55,7 @@ def test_user_email_maximum_length() -> None:
 
     with assert_raises(expected_exception=UserEmailMaxLengthError):
         UserEmail(value=email)
+
 
 @mark.unit_testing
 def test_user_email_missing_at_symbol() -> None:
@@ -81,6 +83,7 @@ def test_user_email_not_string(invalid_value: Any) -> None:
     """
     with assert_raises(expected_exception=UserEmailTypeError):
         UserEmail(value=invalid_value)
+
 
 @mark.unit_testing
 def test_user_email_equality() -> None:
@@ -142,6 +145,7 @@ def test_user_email_with_plus_sign() -> None:
     """
     UserEmailMother.with_plus_sign()
     assert True  # If no exception is raised, the test passes
+
 
 @mark.unit_testing
 def test_user_email_with_dots() -> None:

@@ -45,11 +45,11 @@ class IdentifierMother(BaseMother):
         """
         values: list[str | int] = [
             randint(a=0, b=100),  # noqa: S311  # nosec
-            'a' * randint(a=1, b=100),  # noqa: S311  # nosec
-            ' ' * randint(a=1, b=10),  # noqa: S311  # nosec
-            cls.random().replace('-', '_'),
+            "a" * randint(a=1, b=100),  # noqa: S311  # nosec
+            " " * randint(a=1, b=10),  # noqa: S311  # nosec
+            cls.random().replace("-", "_"),
             cls.random()[:8],
-            cls.random() + 'extra',
+            cls.random() + "extra",
         ]
 
         return str(object=choice(seq=values))  # noqa: S311  # nosec

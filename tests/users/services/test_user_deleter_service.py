@@ -40,7 +40,7 @@ def test_user_deleter_with_a_nonexisting_user() -> None:
 
     with assert_raises(
         expected_exception=UserNotFoundError,
-        match=f'User with <<<id>>> <<<{user_to_delete.id}>>> was not found.',
+        match=f"User with <<<id>>> <<<{user_to_delete.id}>>> was not found.",
     ):
         user_deleter_service.delete(user=user_to_delete, password=password)
 

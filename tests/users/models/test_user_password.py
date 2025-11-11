@@ -38,13 +38,15 @@ def test_user_password_with_mother() -> None:
     assert isinstance(user_password.value, str)
     assert user_password.value.startswith("$argon2id$v=19$m")
 
+
 @mark.unit_testing
 def test_user_password_too_short() -> None:
     """
     Test user password with less than minimum length raises error.
     """
     with assert_raises(expected_exception=UserPasswordMinLengthError):
-        UserPasswordMother.create(length=7) # This will create a UserPassword with length 7 (too short)
+        UserPasswordMother.create(length=7)  # This will create a UserPassword with length 7 (too short)
+
 
 @mark.unit_testing
 def test_user_password_too_long() -> None:
@@ -52,17 +54,18 @@ def test_user_password_too_long() -> None:
     Test user password with more than maximum length raises error.
     """
     with assert_raises(expected_exception=UserPasswordMaxLengthError):
-        UserPasswordMother.create(length=152) # This will create a UserPassword with length 152 (too long)
+        UserPasswordMother.create(length=152)  # This will create a UserPassword with length 152 (too long)
 
 
 @mark.unit_testing
-@mark.parametrize("invalid_password", [12345, 12.34, {2:2}, (1, 2, 3), None, ""])
-def test_user_password_not_string(invalid_password : Any) -> None:
+@mark.parametrize("invalid_password", [12345, 12.34, {2: 2}, (1, 2, 3), None, ""])
+def test_user_password_not_string(invalid_password: Any) -> None:
     """
     Test user password with non-string type raises error.
     """
     with assert_raises(expected_exception=UserPasswordTypeError):
         UserPassword(value=invalid_password)
+
 
 @mark.unit_testing
 def test_user_password_with_non_printable_characters() -> None:
@@ -70,9 +73,8 @@ def test_user_password_with_non_printable_characters() -> None:
     Test user password with non-printable characters raises error.
     """
     with assert_raises(expected_exception=UserPasswordContainsInvalidCharactersError):
-        UserPasswordMother.create(
-            value="Password123\x00!"
-        )
+        UserPasswordMother.create(value="Password123\x00!")
+
 
 @mark.unit_testing
 def test_user_password_equality_with_plain_password() -> None:
@@ -93,7 +95,7 @@ def test_user_password_inequality_with_wrong_plain_password() -> None:
     plain_password = UserPasswordMother.random()
     user_password = UserPassword(value=plain_password)
 
-    assert (user_password != UserPasswordMother.random())
+    assert user_password != UserPasswordMother.random()
 
 
 @mark.unit_testing
@@ -161,19 +163,19 @@ def test_user_password_string_representation() -> None:
 
 
 @mark.unit_testing
-@mark.parametrize("include_special_chars, include_digits, include_uppercase, include_lowercase", [
-    (True, True, True, True),
-    (True, False, True, True),
-    (False, True, True, True),
-    (False, False, True, True),
-    (True, True, False, True),
-    (True, True, True, False),
-])
+@mark.parametrize(
+    "include_special_chars, include_digits, include_uppercase, include_lowercase",
+    [
+        (True, True, True, True),
+        (True, False, True, True),
+        (False, True, True, True),
+        (False, False, True, True),
+        (True, True, False, True),
+        (True, True, True, False),
+    ],
+)
 def test_user_password_with_various_character_combinations(
-    include_special_chars: bool,
-    include_digits: bool,
-    include_uppercase: bool,
-    include_lowercase: bool
+    include_special_chars: bool, include_digits: bool, include_uppercase: bool, include_lowercase: bool
 ) -> None:
     """Test user password creation with various character type combinations is valid.
 
@@ -187,7 +189,7 @@ def test_user_password_with_various_character_combinations(
         include_special_chars=include_special_chars,
         include_digits=include_digits,
         include_upper_case=include_uppercase,
-        include_lower_case=include_lowercase
+        include_lower_case=include_lowercase,
     )
 
     # Verify the password was created and hashed successfully
@@ -195,6 +197,7 @@ def test_user_password_with_various_character_combinations(
     assert isinstance(user_password.value, str)
     assert user_password.value.startswith("$argon2id$v=19$m")
     assert len(user_password.value) > 0
+
 
 @mark.unit_testing
 def test_user_password_with_spaces() -> None:

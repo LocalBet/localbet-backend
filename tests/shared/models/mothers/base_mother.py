@@ -14,7 +14,7 @@ class BaseMother:
     BaseMother class.
     """
 
-    __LOCALES = ('en_US', 'en_CA', 'en_GB', 'es_ES', 'pt_PT', 'fr_FR', 'it_IT')
+    __LOCALES = ("en_US", "en_CA", "en_GB", "es_ES", "pt_PT", "fr_FR", "it_IT")
 
     @classmethod
     def _faker(cls) -> Faker:
@@ -59,16 +59,16 @@ class BaseMother:
             types.append(faker.pystr().encode())
 
         if list not in remove_types:
-            types.append(faker.pylist()) # type: ignore
+            types.append(faker.pylist())  # type: ignore
 
         if set not in remove_types:
-            types.append(faker.pyset()) # type: ignore
+            types.append(faker.pyset())  # type: ignore
 
         if tuple not in remove_types:
-            types.append(faker.pytuple()) # type: ignore
+            types.append(faker.pytuple())  # type: ignore
 
         if dict not in remove_types:
-            types.append(faker.pydict()) # type: ignore
+            types.append(faker.pydict())  # type: ignore
 
         if type(None) not in remove_types:
             types.append(None)

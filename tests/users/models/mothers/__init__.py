@@ -9,13 +9,13 @@ from .user_updated_date_mother import UserUpdatedDateMother
 from .user_username_mother import UserUsernameMother
 
 __all__ = (
-    'UserCreatedDateMother',
-    'UserEmailMother',
-    'UserIdMother',
-    'UserMother',
-    'UserNameMother',
-    'UserPasswordMother',
-    'UserRoleIdMother',
-    'UserUpdatedDateMother',
-    'UserUsernameMother',
+    "UserCreatedDateMother",
+    "UserEmailMother",
+    "UserIdMother",
+    "UserMother",
+    "UserNameMother",
+    "UserPasswordMother",
+    "UserRoleIdMother",
+    "UserUpdatedDateMother",
+    "UserUsernameMother",
 )

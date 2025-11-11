@@ -18,18 +18,18 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustBeLoggedMid
 
 
 @route.delete(
-    path='/',
-    summary='User delete.',
-    description='It allows to delete the logged user account.',
+    path="/",
+    summary="User delete.",
+    description="It allows to delete the logged user account.",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
         status.HTTP_401_UNAUTHORIZED: {
-            'content': {
-                'application/json': {
-                    'example': {
-                        'error': {
-                            'title': 'Unauthorized',
-                            'message': 'The provided access token is invalid.',
+            "content": {
+                "application/json": {
+                    "example": {
+                        "error": {
+                            "title": "Unauthorized",
+                            "message": "The provided access token is invalid.",
                         },
                     }
                 }
@@ -56,6 +56,6 @@ async def user_delete(request: Request, delete_data: UserDeleteSchema) -> None:
     except (UserNotFoundError, PasswordVerificationError) as exception:
         raise HTTPError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            title='Unauthorized',
-            message='Invalid email or password.',
+            title="Unauthorized",
+            message="Invalid email or password.",
         ) from exception

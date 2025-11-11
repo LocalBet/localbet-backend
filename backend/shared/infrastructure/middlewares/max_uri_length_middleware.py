@@ -45,9 +45,9 @@ class MaxUriLengthMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 status_code=status.HTTP_414_REQUEST_URI_TOO_LONG,
                 content={
-                    'error': {
-                        'title': 'URI Too Long',
-                        'message': f'The URI length exceeds {self.__MAX_URI_LENGTH} bytes.',
+                    "error": {
+                        "title": "URI Too Long",
+                        "message": f"The URI length exceeds {self.__MAX_URI_LENGTH} bytes.",
                     }
                 },
             )

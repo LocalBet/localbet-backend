@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter
 
 from .refresh_access_token_endpoint import route as refresh_access_token_endpoint
@@ -10,4 +9,4 @@ router.include_router(router=user_login_endpoint)
 router.include_router(router=user_register_endpoint)
 router.include_router(router=refresh_access_token_endpoint)
 
-__all__ = ('router',)
+__all__ = ("router",)

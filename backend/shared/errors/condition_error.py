@@ -21,7 +21,7 @@ class ConditionError(Exception):
         """
         self.__condition = condition
 
-        message = f'Condition value <<<{condition}>>> must be a valid condition.'
+        message = f"Condition value <<<{condition}>>> must be a valid condition."
         super().__init__(message)
 
     @property

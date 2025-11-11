@@ -77,7 +77,9 @@ class UserUpdateService:
                 user.password = new_password
 
         if role_id is not None:
-            self.__ensure_role_id_exists(role_id=role_id) # TODO: Use the finder service of Role when it is implemented and raise RoleNotFoundError if not found
+            self.__ensure_role_id_exists(
+                role_id=role_id
+            )  # TODO: Use the finder service of Role when it is implemented and raise RoleNotFoundError if not found
             user.role_id = role_id
 
         if hash(user) == server_hash:

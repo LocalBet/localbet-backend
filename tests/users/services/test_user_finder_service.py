@@ -43,4 +43,3 @@ def test_user_finder_with_no_user_found() -> None:
         user_finder_service.find(conditions=find_conditions)
 
     user_actions.assert_search_method_called(conditions=find_conditions)
-

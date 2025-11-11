@@ -18,8 +18,8 @@ class AcceptHeaderMiddleware(BaseHTTPMiddleware):
     """
 
     __ACCEPTABLE_CONTENT_TYPES: ClassVar[set[str]] = {
-        '*/*',
-        'application/json',
+        "*/*",
+        "application/json",
     }
 
     def __init__(self, app: ASGIApp) -> None:
@@ -44,16 +44,16 @@ class AcceptHeaderMiddleware(BaseHTTPMiddleware):
         Returns:
             Response: The HTTP response.
         """
-        accept_header = request.headers.get('Accept', 'application/json').split(',')
-        accept_header = [accept_type.split(';')[0].strip() for accept_type in accept_header]
+        accept_header = request.headers.get("Accept", "application/json").split(",")
+        accept_header = [accept_type.split(";")[0].strip() for accept_type in accept_header]
 
         if not any(accept_type in self.__ACCEPTABLE_CONTENT_TYPES for accept_type in accept_header):
             return JSONResponse(
                 status_code=status.HTTP_406_NOT_ACCEPTABLE,
                 content={
-                    'error': {
-                        'title': 'Not Acceptable',
-                        'message': f"Accept header '{accept_header}' is not supported. Supported types: {', '.join(self.__ACCEPTABLE_CONTENT_TYPES)}",  # noqa: E501
+                    "error": {
+                        "title": "Not Acceptable",
+                        "message": f"Accept header '{accept_header}' is not supported. Supported types: {', '.join(self.__ACCEPTABLE_CONTENT_TYPES)}",  # noqa: E501
                     }
                 },
             )

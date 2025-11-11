@@ -38,4 +38,3 @@ class UserEmail(ValueObject[str]):
 
         if len(value) > self.__USER_EMAIL_MAX_LENGTH:
             raise UserEmailMaxLengthError(max_length=self.__USER_EMAIL_MAX_LENGTH)
-

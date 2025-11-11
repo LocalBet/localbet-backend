@@ -98,8 +98,8 @@ def test_refresh_access_token_decode_exception() -> None:
 
     # Mock the decode to raise an exception
     with mock.patch(
-        'backend.auth.services.refresh_access_token_service.RefreshToken.decode',
-        side_effect=JSONDecodeError(msg="Decode failed", doc="", pos=0)
+        "backend.auth.services.refresh_access_token_service.RefreshToken.decode",
+        side_effect=JSONDecodeError(msg="Decode failed", doc="", pos=0),
     ), assert_raises(expected_exception=InvalidRefreshTokenError):
         refresh_service.refresh(refresh_token=valid_token)
 

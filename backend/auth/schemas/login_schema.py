@@ -15,11 +15,11 @@ class LoginSchema(BaseRequestSchema):
     email: str = Field(
         default=...,
         description="The user's email address.",
-        examples=['joedoesmith@example.com'],
+        examples=["joedoesmith@example.com"],
     )
 
     password: str = Field(
         default=...,
         description="The user's password in plain text.",
-        examples=['P#ssW0rd@23!'],
+        examples=["P#ssW0rd@23!"],
     )

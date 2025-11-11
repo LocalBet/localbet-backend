@@ -7,7 +7,9 @@ from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 
-def MiddlewareWrapper(middlewares: list[Middleware | type[BaseHTTPMiddleware]] | None = None) -> type[APIRoute]:  # noqa: N802
+def MiddlewareWrapper(
+    middlewares: list[Middleware | type[BaseHTTPMiddleware]] | None = None,
+) -> type[APIRoute]:  # noqa: N802
     """
     Custom middleware wrapper that allows to add middlewares to FastAPI routes.
 

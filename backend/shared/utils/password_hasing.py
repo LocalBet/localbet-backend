@@ -1,6 +1,7 @@
 """
 Password hashing utilities.
 """
+
 from enum import StrEnum, unique
 from secrets import SystemRandom
 from typing import Annotated, assert_never
@@ -9,10 +10,11 @@ from argon2 import PasswordHasher, Type
 from argon2.exceptions import VerifyMismatchError
 from pydantic import Field, validate_call
 
-ALPHABET_LOWERCASE_BASIC: str = 'abcdefghijklmnopqrstuvwxyz'
-ALPHABET_UPPERCASE_BASIC: str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-DIGITS_BASIC: str = '0123456789'
+ALPHABET_LOWERCASE_BASIC: str = "abcdefghijklmnopqrstuvwxyz"
+ALPHABET_UPPERCASE_BASIC: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+DIGITS_BASIC: str = "0123456789"
 ALPHABET_BASIC: str = ALPHABET_LOWERCASE_BASIC + ALPHABET_UPPERCASE_BASIC + DIGITS_BASIC
+
 
 @unique
 class KDFAlgorithm(StrEnum):
@@ -21,21 +23,23 @@ class KDFAlgorithm(StrEnum):
     Suitable for password hashing.
     """
 
-    ARGON2I = 'argon2i'
-    ARGON2D = 'argon2d'
-    ARGON2ID = 'argon2id'
+    ARGON2I = "argon2i"
+    ARGON2D = "argon2d"
+    ARGON2ID = "argon2id"
+
 
 def random_salt() -> str:
-        """
-        Generates a random salt of the specified length using the basic alphabet (lowercase, uppercase, digits).
-        By default, the length is 32 characters.
+    """
+    Generates a random salt of the specified length using the basic alphabet (lowercase, uppercase, digits).
+    By default, the length is 32 characters.
 
-        Raises:
-            ValueError: If length is less than 1.
-        Returns:
-            str: The generated random salt.
-        """
-        return ''.join(SystemRandom().choice(seq=ALPHABET_BASIC) for _ in range(32))
+    Raises:
+        ValueError: If length is less than 1.
+    Returns:
+        str: The generated random salt.
+    """
+    return "".join(SystemRandom().choice(seq=ALPHABET_BASIC) for _ in range(32))
+
 
 @validate_call
 def password_hashing(
@@ -44,8 +48,8 @@ def password_hashing(
         Field(
             default=...,
             min_length=1,
-            description='The data to hash.',
-            examples=['data'],
+            description="The data to hash.",
+            examples=["data"],
             strict=True,
         ),
     ],
@@ -53,7 +57,7 @@ def password_hashing(
         KDFAlgorithm,
         Field(
             default=KDFAlgorithm.ARGON2ID,
-            description='The KDF algorithm to use for hashing. This is only for password hashing purposes.',
+            description="The KDF algorithm to use for hashing. This is only for password hashing purposes.",
             examples=[KDFAlgorithm.ARGON2ID],
         ),
     ] = KDFAlgorithm.ARGON2ID,
@@ -61,8 +65,8 @@ def password_hashing(
         str | None,
         Field(
             min_length=1,
-            description='The salt to use.',
-            examples=['salt123'],
+            description="The salt to use.",
+            examples=["salt123"],
             strict=True,
         ),
     ] = None,
@@ -106,20 +110,19 @@ def password_hashing(
     """
     if kdf_algorithm == KDFAlgorithm.ARGON2ID:
         return PasswordHasher(type=Type.ID).hash(
-            password=bytes(data, encoding='utf-8'),
-            salt=bytes(salt if salt is not None else random_salt(), encoding='utf-8'),
+            password=bytes(data, encoding="utf-8"),
+            salt=bytes(salt if salt is not None else random_salt(), encoding="utf-8"),
         )
 
     elif kdf_algorithm == KDFAlgorithm.ARGON2D:
-        return PasswordHasher(type=Type.D
-    ).hash(
-        password=bytes(data, encoding='utf-8'),
-        salt=bytes(salt if salt is not None else random_salt(), encoding='utf-8'),
-    )
+        return PasswordHasher(type=Type.D).hash(
+            password=bytes(data, encoding="utf-8"),
+            salt=bytes(salt if salt is not None else random_salt(), encoding="utf-8"),
+        )
     elif kdf_algorithm == KDFAlgorithm.ARGON2I:
         return PasswordHasher(type=Type.I).hash(
-            password=bytes(data, encoding='utf-8'),
-            salt=bytes(salt if salt is not None else random_salt(), encoding='utf-8'),
+            password=bytes(data, encoding="utf-8"),
+            salt=bytes(salt if salt is not None else random_salt(), encoding="utf-8"),
         )
     else:
         assert_never(kdf_algorithm)
@@ -133,8 +136,8 @@ def compare_passwords(
         Field(
             default=...,
             min_length=1,
-            description='The plain password.',
-            examples=['password123'],
+            description="The plain password.",
+            examples=["password123"],
             strict=True,
         ),
     ],
@@ -143,9 +146,9 @@ def compare_passwords(
         Field(
             default=...,
             min_length=1,
-            description='The hashed password.',
+            description="The hashed password.",
             examples=[
-                '$argon2id$v=19$m=47104,t=1,p=5$UkN4OGpkSDVsd1pqUXdOY3Nyd3kwUHlzSm5HNWJBZ3g$j6/mFJz8yeDfX2ka4FDELP8HJl8VwyJH7vURmT8iyKg'
+                "$argon2id$v=19$m=47104,t=1,p=5$UkN4OGpkSDVsd1pqUXdOY3Nyd3kwUHlzSm5HNWJBZ3g$j6/mFJz8yeDfX2ka4FDELP8HJl8VwyJH7vURmT8iyKg"
             ],
             strict=True,
         ),
@@ -169,8 +172,8 @@ def compare_passwords(
     """
     try:
         return PasswordHasher().verify(
-            hash=hashed_password.encode(encoding='utf-8'),
-            password=plain_password.encode(encoding='utf-8'),
+            hash=hashed_password.encode(encoding="utf-8"),
+            password=plain_password.encode(encoding="utf-8"),
         )
 
     except VerifyMismatchError:

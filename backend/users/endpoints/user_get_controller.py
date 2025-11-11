@@ -12,20 +12,20 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustBeLoggedMid
 
 
 @route.get(
-    path='/',
-    summary='Get the current logged user account.',
-    description='It allows to get the current logged user account.',
+    path="/",
+    summary="Get the current logged user account.",
+    description="It allows to get the current logged user account.",
     responses={
         status.HTTP_200_OK: {
-            'model': UserGetSchema,
+            "model": UserGetSchema,
         },
         status.HTTP_401_UNAUTHORIZED: {
-            'content': {
-                'application/json': {
-                    'example': {
-                        'error': {
-                            'title': 'Unauthorized',
-                            'message': 'The provided access token is invalid.',
+            "content": {
+                "application/json": {
+                    "example": {
+                        "error": {
+                            "title": "Unauthorized",
+                            "message": "The provided access token is invalid.",
                         },
                     }
                 }

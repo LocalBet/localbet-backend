@@ -55,7 +55,7 @@ class BaseRequestSchema(BaseModel):
                     data.pop(model_aliases[field])  # type: ignore[arg-type]
                     missing_fields.remove(field)
 
-                if hasattr(model_types[field], '__args__') and NoneType in model_types[field].__args__:  # type: ignore[union-attr] # noqa: SIM102
+                if hasattr(model_types[field], "__args__") and NoneType in model_types[field].__args__:  # type: ignore[union-attr] # noqa: SIM102
                     if field in missing_fields:
                         # If the field is optional and it is not provided, set it to None
                         provided_fields.add(field)

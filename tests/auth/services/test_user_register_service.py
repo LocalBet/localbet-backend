@@ -1,6 +1,7 @@
 """
 Test user register domain service.
 """
+
 from datetime import UTC, datetime as real_datetime
 from unittest.mock import patch
 
@@ -24,7 +25,7 @@ def test_user_register() -> None:
     random_datetime = DatetimeMother.now()
     expected_user = UserMother.create(created_date=random_datetime, updated_date=random_datetime)
 
-    with patch('backend.auth.services.user_register_service.datetime') as mock_dt:
+    with patch("backend.auth.services.user_register_service.datetime") as mock_dt:
         # Mock datetime.now() to return the expected created_date and updated_date
         mock_dt.now.return_value = random_datetime
         mock_dt.side_effect = real_datetime
@@ -42,6 +43,7 @@ def test_user_register() -> None:
 
     user_actions.assert_save_method_called(user=expected_user)
 
+
 @mark.unit_testing
 def test_user_register_password_mismatch() -> None:
     """
@@ -53,7 +55,7 @@ def test_user_register_password_mismatch() -> None:
     random_datetime = DatetimeMother.now()
     expected_user = UserMother.create(created_date=random_datetime, updated_date=random_datetime)
 
-    with patch('backend.auth.services.user_register_service.datetime') as mock_dt:
+    with patch("backend.auth.services.user_register_service.datetime") as mock_dt:
         # Mock datetime.now() to return the expected created_date and updated_date
         mock_dt.now.return_value = random_datetime
         mock_dt.side_effect = real_datetime
@@ -72,6 +74,7 @@ def test_user_register_password_mismatch() -> None:
 
         user_actions.assert_save_method_not_called()
 
+
 @mark.unit_testing
 def test_user_register_with_an_existing_user() -> None:
     """
@@ -88,7 +91,7 @@ def test_user_register_with_an_existing_user() -> None:
         value=expected_user.id,
     )
 
-    with patch('backend.auth.services.user_register_service.datetime') as mock_dt:
+    with patch("backend.auth.services.user_register_service.datetime") as mock_dt:
         # Mock datetime.now() to return the expected created_date and updated_date
         mock_dt.now.return_value = random_datetime
         mock_dt.side_effect = real_datetime
@@ -106,6 +109,7 @@ def test_user_register_with_an_existing_user() -> None:
             )
 
         user_actions.assert_save_method_called(user=expected_user)
+
 
 @mark.unit_testing
 def test_user_register_with_an_existing_user_email() -> None:
@@ -123,7 +127,7 @@ def test_user_register_with_an_existing_user_email() -> None:
         value=expected_user.email,
     )
 
-    with patch('backend.auth.services.user_register_service.datetime') as mock_dt:
+    with patch("backend.auth.services.user_register_service.datetime") as mock_dt:
         # Mock datetime.now() to return the expected created_date and updated_date
         mock_dt.now.return_value = random_datetime
         mock_dt.side_effect = real_datetime
@@ -141,6 +145,7 @@ def test_user_register_with_an_existing_user_email() -> None:
             )
 
         user_actions.assert_save_method_called(user=expected_user)
+
 
 def test_user_register_with_an_existing_user_username() -> None:
     """
@@ -157,7 +162,7 @@ def test_user_register_with_an_existing_user_username() -> None:
         value=expected_user.username,
     )
 
-    with patch('backend.auth.services.user_register_service.datetime') as mock_dt:
+    with patch("backend.auth.services.user_register_service.datetime") as mock_dt:
         # Mock datetime.now() to return the expected created_date and updated_date
         mock_dt.now.return_value = random_datetime
         mock_dt.side_effect = real_datetime
@@ -176,6 +181,7 @@ def test_user_register_with_an_existing_user_username() -> None:
 
         user_actions.assert_save_method_called(user=expected_user)
 
+
 @mark.unit_testing
 @mark.xfail(reason="Role existence check not implemented yet.")
 def test_user_register_with_non_existing_role_id() -> None:
@@ -190,13 +196,15 @@ def test_user_register_with_non_existing_role_id() -> None:
     random_datetime = DatetimeMother.now()
     expected_user = UserMother.create(created_date=random_datetime, updated_date=random_datetime)
 
-    with patch('backend.auth.services.user_register_service.datetime') as mock_dt:
+    with patch("backend.auth.services.user_register_service.datetime") as mock_dt:
         # Mock datetime.now() to return the expected created_date and updated_date
         mock_dt.now.return_value = random_datetime
         mock_dt.side_effect = real_datetime
         mock_dt.UTC = UTC
 
-        with assert_raises(expected_exception=Exception):  # noqa: B017 TODO: Replace Exception with RoleNotFoundError when implemented
+        with assert_raises(
+            expected_exception=Exception
+        ):  # noqa: B017 TODO: Replace Exception with RoleNotFoundError when implemented
             user_register_service.register(
                 id=expected_user.id,
                 name=expected_user.name,

@@ -5,9 +5,9 @@ from .max_payload_length_middleware import MaxPayloadLengthMiddleware
 from .max_uri_length_middleware import MaxUriLengthMiddleware
 
 __all__ = (
-    'AcceptHeaderMiddleware',
-    'ContentTypeMiddleware',
-    'MaxHeaderLengthMiddleware',
-    'MaxPayloadLengthMiddleware',
-    'MaxUriLengthMiddleware',
+    "AcceptHeaderMiddleware",
+    "ContentTypeMiddleware",
+    "MaxHeaderLengthMiddleware",
+    "MaxPayloadLengthMiddleware",
+    "MaxUriLengthMiddleware",
 )

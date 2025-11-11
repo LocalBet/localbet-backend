@@ -172,4 +172,4 @@ class MockUserActions(UserActions):
         Args:
             user (User): User to assert.
         """
-        self.__delete_mock.side_effect = UserNotFoundError(field='id', value=user.id)
+        self.__delete_mock.side_effect = UserNotFoundError(field="id", value=user.id)

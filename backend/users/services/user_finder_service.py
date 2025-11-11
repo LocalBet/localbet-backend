@@ -37,6 +37,6 @@ class UserFinderService:
         users = self.__action.search(conditions=conditions)
 
         if not users:
-            raise UserNotFoundError(field='conditions', value=conditions)
+            raise UserNotFoundError(field="conditions", value=conditions)
 
         return users

@@ -47,8 +47,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
 
 app = FastAPI(title=Settings.APPLICATION_NAME, version="1.0.0", docs_url="/docs", redoc_url=None, lifespan=lifespan)
 
-app.include_router(router=auth_router, prefix='/auth', tags=['Authentication'])
-app.include_router(router=users_router, prefix='/users', tags=['Users'])
+app.include_router(router=auth_router, prefix="/auth", tags=["Authentication"])
+app.include_router(router=users_router, prefix="/users", tags=["Users"])
 
 app.add_middleware(middleware_class=MaxUriLengthMiddleware)
 app.add_middleware(middleware_class=MaxHeaderLengthMiddleware)
@@ -58,8 +58,8 @@ app.add_middleware(middleware_class=AcceptHeaderMiddleware)
 app.add_middleware(
     middleware_class=CORSMiddleware,
     allow_origins=[Settings.FRONTEND_URL],
-    allow_methods=['GET', 'POST', 'PUT', 'DELETE'],
-    allow_headers=['Authorization'],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization"],
     allow_credentials=True,
     max_age=600,  # 10 minutes
 )

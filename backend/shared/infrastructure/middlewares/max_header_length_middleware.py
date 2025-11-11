@@ -46,9 +46,9 @@ class MaxHeaderLengthMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 status_code=status.HTTP_431_REQUEST_HEADER_FIELDS_TOO_LARGE,
                 content={
-                    'error': {
-                        'title': 'Request Header Fields Too Large',
-                        'message': f'Header size exceeds {self.__MAX_HEADER_LENGTH} bytes.',
+                    "error": {
+                        "title": "Request Header Fields Too Large",
+                        "message": f"Header size exceeds {self.__MAX_HEADER_LENGTH} bytes.",
                     }
                 },
             )

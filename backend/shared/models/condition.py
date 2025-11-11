@@ -13,6 +13,7 @@ from .sql_operations import SQLOperation
 
 T = TypeVar("T", bound=DataModel)
 
+
 class Condition(Generic[T], DataModel):
     """
     SQL condition operations.
@@ -56,14 +57,14 @@ class Condition(Generic[T], DataModel):
         """
         return self.__value
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     @classmethod
     def validate_field(cls, values: dict[Any, Any]) -> dict[Any, Any]:
         """
         Validate that the field is a valid column of the data model.
         """
-        field_name = values.get('field')
-        model = cls.__annotations__.get('T')  # Get the generic model type
+        field_name = values.get("field")
+        model = cls.__annotations__.get("T")  # Get the generic model type
 
         if model and isinstance(field_name, str) and not hasattr(model, field_name):
             raise ConditionError(condition=cls(**values))

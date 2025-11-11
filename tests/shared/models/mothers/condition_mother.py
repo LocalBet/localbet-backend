@@ -1,6 +1,7 @@
 """
 ConditionMother to create Condition objects for tests.
 """
+
 from secrets import choice
 
 from backend.shared.models import Condition, DataModel, SQLOperation

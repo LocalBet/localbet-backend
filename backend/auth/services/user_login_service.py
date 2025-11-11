@@ -47,16 +47,18 @@ class UserLoginService:
             tuple[str, str]: The access and refresh tokens.
         """
         users: list[User] = self.__user_finder.find(
-            conditions=[Condition(
-                field='email',
-                operator=SQLOperation.EQUAL,
-                value=email,
-            )]
+            conditions=[
+                Condition(
+                    field="email",
+                    operator=SQLOperation.EQUAL,
+                    value=email,
+                )
+            ]
         )
 
         if not users:
             self.__avoid_timing_attack(password=password)
-            raise UserNotFoundError(field='email', value=email)
+            raise UserNotFoundError(field="email", value=email)
 
         if not users[0].check_password(plain_password=password):
             raise PasswordVerificationError()

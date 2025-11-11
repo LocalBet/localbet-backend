@@ -175,10 +175,12 @@ class JWT:
         header = {}
         header["alg"] = str(algorithm)
 
-        token_bytes: Any = jwt.encode(header=header, payload=payload, key=secret) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+        token_bytes: Any = jwt.encode(
+            header=header, payload=payload, key=secret
+        )  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
         if isinstance(token_bytes, bytes):
             return token_bytes.decode("utf-8")
-        return str(token_bytes) # pyright: ignore[reportUnknownArgumentType]
+        return str(token_bytes)  # pyright: ignore[reportUnknownArgumentType]
 
     @classmethod
     @validate_call

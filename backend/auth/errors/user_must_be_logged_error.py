@@ -14,4 +14,4 @@ class UserMustBeLoggedError(InvalidCredentialsError):
         """
         UserMustBeLoggedError constructor.
         """
-        super().__init__(message='Authentication is required to access this resource.')
+        super().__init__(message="Authentication is required to access this resource.")

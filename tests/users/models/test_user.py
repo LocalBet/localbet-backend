@@ -186,6 +186,7 @@ def test_user_update_date_setter() -> None:
 
     assert user.update_date == new_update_date
 
+
 @mark.unit_testing
 def test_user_create_date_setter() -> None:
     """
@@ -195,9 +196,10 @@ def test_user_create_date_setter() -> None:
     original_create_date = user.create_date
     new_create_date = datetime.now(tz=UTC)
     with assert_raises(AttributeError):
-        user.create_date = new_create_date # pyright: ignore[reportAttributeAccessIssue]
+        user.create_date = new_create_date  # pyright: ignore[reportAttributeAccessIssue]
 
     assert user.create_date == original_create_date
+
 
 def test_user_role_id_setter() -> None:
     """
@@ -209,6 +211,7 @@ def test_user_role_id_setter() -> None:
     user.role_id = new_role_id
 
     assert user.role_id == new_role_id
+
 
 @mark.unit_testing
 def test_user_check_password_success() -> None:
@@ -296,6 +299,7 @@ def test_user_update_date_preserves_create_date() -> None:
     user.update_date = new_update_date
 
     assert user.create_date == original_create_date
+
 
 @mark.unit_testing
 def test_user_password_setter_hashes_password() -> None:

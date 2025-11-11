@@ -18,20 +18,20 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLogged
 
 
 @route.post(
-    path='/refresh',
-    summary='Refresh user access token.',
-    description='It allows to refresh the user access token with the refresh token.',
+    path="/refresh",
+    summary="Refresh user access token.",
+    description="It allows to refresh the user access token with the refresh token.",
     responses={
         status.HTTP_200_OK: {
-            'model': AccessTokenSchema,
+            "model": AccessTokenSchema,
         },
         status.HTTP_401_UNAUTHORIZED: {
-            'content': {
-                'application/json': {
-                    'example': {
-                        'error': {
-                            'title': 'Unauthorized',
-                            'message': 'The provided refresh token is invalid.',
+            "content": {
+                "application/json": {
+                    "example": {
+                        "error": {
+                            "title": "Unauthorized",
+                            "message": "The provided refresh token is invalid.",
                         },
                     }
                 }
@@ -65,7 +65,7 @@ async def user_login(refresh_data: RefreshTokenSchema) -> AccessTokenSchema:
     except InvalidRefreshTokenError as exception:
         raise HTTPError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            title='Unauthorized',
+            title="Unauthorized",
             message=exception.message,
         ) from exception
 

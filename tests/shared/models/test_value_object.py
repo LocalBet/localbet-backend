@@ -30,7 +30,7 @@ def test_value_object_slots() -> None:
     """
     Test the slots of a value object.
     """
-    assert SimpleValueObject.__slots__ == ('_value',)
+    assert SimpleValueObject.__slots__ == ("_value",)
 
 
 @mark.unit_testing
@@ -40,7 +40,7 @@ def test_value_object_detailed_string_representation() -> None:
     """
     value_object = SimpleValueObject(value=1)
 
-    assert repr(value_object) == f'{value_object.__class__.__name__}(value=1)'
+    assert repr(value_object) == f"{value_object.__class__.__name__}(value=1)"
 
 
 @mark.unit_testing
@@ -48,7 +48,7 @@ def test_value_object_string_representation() -> None:
     """
     Test the string representation of a value object.
     """
-    assert str(object=SimpleValueObject(value=1)) == '1'
+    assert str(object=SimpleValueObject(value=1)) == "1"
 
 
 @mark.unit_testing
@@ -105,7 +105,7 @@ def test_value_object_cannot_modify_protected_value() -> None:
         expected_exception=AttributeError,
         match='Cannot modify attribute "_value" of immutable instance',
     ):
-        value_object._value = 2 # pyright: ignore[reportPrivateUsage]
+        value_object._value = 2  # pyright: ignore[reportPrivateUsage]
 
 
 @mark.unit_testing

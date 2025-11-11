@@ -26,7 +26,7 @@ class UserNotFoundError(DomainBaseError):
         self.__field = field
         self.__value = value
 
-        message = f'User with <<<{field}>>> <<<{value}>>> was not found.'
+        message = f"User with <<<{field}>>> <<<{value}>>> was not found."
         super().__init__(message=message)
 
     @property

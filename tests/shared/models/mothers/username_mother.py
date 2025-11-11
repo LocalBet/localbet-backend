@@ -22,7 +22,7 @@ class UsernameMother(BaseMother):
             int: Random username.
         """
         username = cls._faker().user_name()
-        username = username.replace('-', '_')
+        username = username.replace("-", "_")
 
         return username
 
@@ -37,7 +37,7 @@ class UsernameMother(BaseMother):
         Returns:
             str: Person username of the given length.
         """
-        return 'a' * length
+        return "a" * length
 
     @classmethod
     def some_uppercase(cls) -> str:
@@ -51,7 +51,7 @@ class UsernameMother(BaseMother):
 
         options = [
             username.title(),
-            'A'.join(choice(seq=[word.lower(), word.upper()]) for word in username),  # noqa: S311  # nosec
+            "A".join(choice(seq=[word.lower(), word.upper()]) for word in username),  # noqa: S311  # nosec
             username.upper(),
         ]
 
@@ -77,8 +77,6 @@ class UsernameMother(BaseMother):
         Returns:
             str: Invalid username value.
         """
-        non_printable_chars = ''.join(chr(i) for i in range(33))
+        non_printable_chars = "".join(chr(i) for i in range(33))
 
-        return ''.join(choice(seq=non_printable_chars) for _ in range(10))  # noqa: S311  # nosec
-
-
+        return "".join(choice(seq=non_printable_chars) for _ in range(10))  # noqa: S311  # nosec

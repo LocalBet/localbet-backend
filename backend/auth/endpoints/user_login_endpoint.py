@@ -1,4 +1,3 @@
-
 """
 Login controller.
 """
@@ -20,37 +19,37 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLogged
 
 
 @route.post(
-    path='/login',
-    summary='User login endpoint.',
+    path="/login",
+    summary="User login endpoint.",
     description=(
-        'Authenticate an user by verifying their email and password. If the credentials are valid, the API returns an'
-        'access and a refresh token for further authentication.'
+        "Authenticate an user by verifying their email and password. If the credentials are valid, the API returns an"
+        "access and a refresh token for further authentication."
     ),
     responses={
         status.HTTP_200_OK: {
-            'model': AccessTokenSchema,
+            "model": AccessTokenSchema,
         },
         status.HTTP_401_UNAUTHORIZED: {
-            'content': {
-                'application/json': {
-                    'examples': {
-                        'InvalidCredentials': {
-                            'summary': 'Invalid Credentials',
-                            'description': 'Unauthorized access due to invalid credentials.',
-                            'value': {
-                                'error': {
-                                    'title': 'Unauthorized',
-                                    'message': 'Invalid email or password.',
+            "content": {
+                "application/json": {
+                    "examples": {
+                        "InvalidCredentials": {
+                            "summary": "Invalid Credentials",
+                            "description": "Unauthorized access due to invalid credentials.",
+                            "value": {
+                                "error": {
+                                    "title": "Unauthorized",
+                                    "message": "Invalid email or password.",
                                 },
                             },
                         },
-                        'AlreadyAuthenticated': {
-                            'summary': 'Already Authenticated',
-                            'description': 'Unauthorized access due to the user is already authenticated.',
-                            'value': {
-                                'error': {
-                                    'title': 'Unauthorized',
-                                    'message': 'Cannot be authenticated to access this resource.',
+                        "AlreadyAuthenticated": {
+                            "summary": "Already Authenticated",
+                            "description": "Unauthorized access due to the user is already authenticated.",
+                            "value": {
+                                "error": {
+                                    "title": "Unauthorized",
+                                    "message": "Cannot be authenticated to access this resource.",
                                 }
                             },
                         },
@@ -82,8 +81,8 @@ async def user_login(login_data: LoginSchema) -> AccessTokenSchema:
     except (UserNotFoundError, PasswordVerificationError) as exception:
         raise HTTPError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            title='Unauthorized',
-            message='Invalid email or password.',
+            title="Unauthorized",
+            message="Invalid email or password.",
         ) from exception
 
     return AccessTokenSchema(access_token=access_token, refresh_token=refresh_token)

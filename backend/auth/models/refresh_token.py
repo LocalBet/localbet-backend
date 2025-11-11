@@ -86,10 +86,10 @@ class RefreshToken:
             accepted_algorithms=[self.__algorithm],
         )
 
-        self.__subject = str(object=UUID(hex=decoded_token['sub']))
-        self.__expiration_datetime = decoded_token['exp']
-        self.__not_before_datetime = decoded_token['nbf']
-        self.__token_id = str(object=UUID(hex=decoded_token['jti']))
+        self.__subject = str(object=UUID(hex=decoded_token["sub"]))
+        self.__expiration_datetime = decoded_token["exp"]
+        self.__not_before_datetime = decoded_token["nbf"]
+        self.__token_id = str(object=UUID(hex=decoded_token["jti"]))
 
         return self
 

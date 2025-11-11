@@ -1,4 +1,3 @@
-
 """
 UserAlreadyExistsError module.
 """
@@ -27,7 +26,7 @@ class UserAlreadyExistsError(DomainBaseError):
         self.__field = field
         self.__value = value
 
-        message = f'User with <<<{field}>>> <<<{value}>>> already exists.'
+        message = f"User with <<<{field}>>> <<<{value}>>> already exists."
         super().__init__(message=message)
 
     @property

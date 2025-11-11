@@ -94,6 +94,7 @@ def test_user_username_not_string(invalid_value: Any) -> None:
     with assert_raises(expected_exception=UserUsernameTypeError):
         UserUsername(value=invalid_value)
 
+
 @mark.unit_testing
 def test_user_username_with_uppercase() -> None:
     """
@@ -102,6 +103,7 @@ def test_user_username_with_uppercase() -> None:
     with assert_raises(expected_exception=UserUsernameUppercaseError):
         UserUsername(value=UserUsernameMother.some_uppercase())
 
+
 @mark.unit_testing
 def test_user_username_with_special_characters() -> None:
     """
@@ -109,6 +111,7 @@ def test_user_username_with_special_characters() -> None:
     """
     with assert_raises(expected_exception=UserUsernameContainsInvalidCharactersError):
         UserUsername(value=UserUsernameMother.invalid_value())
+
 
 @mark.unit_testing
 def test_user_username_empty_string() -> None:
@@ -156,6 +159,7 @@ def test_user_username_hash() -> None:
 
     username_set = {user_username1, user_username2}
     assert len(username_set) == 1
+
 
 @mark.unit_testing
 def test_user_username_ends_with_underscore() -> None:

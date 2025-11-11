@@ -39,6 +39,7 @@ def test_user_login_happy_path() -> None:
     assert len(access_token) > 0
     assert len(refresh_token) > 0
 
+
 @mark.unit_testing
 def test_user_login_user_not_found() -> None:
     """
@@ -58,6 +59,7 @@ def test_user_login_user_not_found() -> None:
             email=non_existent_email,
             password=plain_password,
         )
+
 
 @mark.unit_testing
 def test_user_login_wrong_password() -> None:
@@ -80,6 +82,7 @@ def test_user_login_wrong_password() -> None:
             email=user.email,
             password=wrong_password,
         )
+
 
 @mark.unit_testing
 def test_user_login_empty_password() -> None:
@@ -139,7 +142,7 @@ def test_user_login_timing_attack_protection() -> None:
     non_existent_email = EmailMother.random()
 
     with mock.patch(
-        'backend.auth.services.user_login_service.UserLoginService._UserLoginService__avoid_timing_attack'
+        "backend.auth.services.user_login_service.UserLoginService._UserLoginService__avoid_timing_attack"
     ) as mock_avoid, assert_raises(expected_exception=UserNotFoundError):
         user_login_service.login(
             email=non_existent_email,

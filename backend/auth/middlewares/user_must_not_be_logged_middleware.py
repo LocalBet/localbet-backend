@@ -1,4 +1,3 @@
-
 """
 This module contains the middleware that checks if the user is not logged in.
 """
@@ -50,9 +49,9 @@ class UserMustNotBeLoggedMiddleware(BaseHTTPMiddleware):
             action = PostgreSQLUserActions(connection=database_connection)
             self.__finder = UserFinderService(action=action)
 
-            access_token = request.headers.get('Authorization')
+            access_token = request.headers.get("Authorization")
             if access_token is not None:
-                access_token = access_token.replace('Bearer ', '')
+                access_token = access_token.replace("Bearer ", "")
 
             logged_user = self.__retrieve_user(access_token=access_token)
             if logged_user is not None:
@@ -79,13 +78,11 @@ class UserMustNotBeLoggedMiddleware(BaseHTTPMiddleware):
         except Exception:
             return None
 
-        conditions: list[Condition[DataModel]] = [Condition[DataModel](
-                             field='id',
-                            operator=SQLOperation.EQUAL,
-                            value=user_id
-                         )]
+        conditions: list[Condition[DataModel]] = [
+            Condition[DataModel](field="id", operator=SQLOperation.EQUAL, value=user_id)
+        ]
 
-        users =  self.__finder.find(conditions=conditions)
+        users = self.__finder.find(conditions=conditions)
 
         if users and len(users) > 1:
             raise UserMustNotBeLoggedError()

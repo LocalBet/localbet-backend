@@ -18,7 +18,7 @@ class ContentTypeMiddleware(BaseHTTPMiddleware):
     """
 
     __ALLOWED_CONTENT_TYPES: ClassVar[set[str]] = {
-        'application/json',
+        "application/json",
     }
 
     def __init__(self, app: ASGIApp) -> None:
@@ -42,7 +42,7 @@ class ContentTypeMiddleware(BaseHTTPMiddleware):
         Returns:
             Response: The HTTP response.
         """
-        content_type = request.headers.get('Content-Type')
+        content_type = request.headers.get("Content-Type")
         if content_type is None:
             return await call_next(request)
 
@@ -50,9 +50,9 @@ class ContentTypeMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
                 content={
-                    'error': {
-                        'title': 'Unsupported Media Type',
-                        'message': f"Content type '{content_type}' is not supported. Allowed types: {', '.join(self.__ALLOWED_CONTENT_TYPES)}",  # noqa: E501
+                    "error": {
+                        "title": "Unsupported Media Type",
+                        "message": f"Content type '{content_type}' is not supported. Allowed types: {', '.join(self.__ALLOWED_CONTENT_TYPES)}",  # noqa: E501
                     }
                 },
             )

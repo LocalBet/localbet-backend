@@ -14,5 +14,5 @@ class NoRowAffectedError(IntegrityError):
         """
         NoRowAffectedError constructor.
         """
-        message = 'The executed query did not affect any rows.'
+        message = "The executed query did not affect any rows."
         super().__init__(message)

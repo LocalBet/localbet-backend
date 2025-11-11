@@ -43,4 +43,4 @@ class WordMother(BaseMother):
         Returns:
             str: Word of the given length.
         """
-        return 'a' * length
+        return "a" * length

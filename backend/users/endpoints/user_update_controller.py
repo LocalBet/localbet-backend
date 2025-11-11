@@ -1,4 +1,3 @@
-
 """
 User update controller module.
 """
@@ -25,30 +24,30 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustBeLoggedMid
 
 
 @route.put(
-    path='/',
-    summary='User update.',
-    description='It allows to update the logged user account.',
+    path="/",
+    summary="User update.",
+    description="It allows to update the logged user account.",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
         status.HTTP_400_BAD_REQUEST: {
-            'content': {
-                'application/json': {
-                    'example': {
-                        'error': {
-                            'title': 'UserUsernameContainsInvalidCharactersError',
-                            'message': 'UserUsername value <<<johndoe#>>> contains invalid characters. Only alphanumeric characters and underscores are allowed.',  # noqa: E501
+            "content": {
+                "application/json": {
+                    "example": {
+                        "error": {
+                            "title": "UserUsernameContainsInvalidCharactersError",
+                            "message": "UserUsername value <<<johndoe#>>> contains invalid characters. Only alphanumeric characters and underscores are allowed.",  # noqa: E501
                         }
                     },
                 },
             },
         },
         status.HTTP_401_UNAUTHORIZED: {
-            'content': {
-                'application/json': {
-                    'example': {
-                        'error': {
-                            'title': 'Unauthorized',
-                            'message': 'The provided access token is invalid.',
+            "content": {
+                "application/json": {
+                    "example": {
+                        "error": {
+                            "title": "Unauthorized",
+                            "message": "The provided access token is invalid.",
                         },
                     }
                 }
@@ -91,6 +90,6 @@ async def user_update(request: Request, update_data: UserUpdateSchema) -> None:
     except (UserNotFoundError, PasswordVerificationError) as exception:
         raise HTTPError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            title='Unauthorized',
-            message='Invalid email or password.',
+            title="Unauthorized",
+            message="Invalid email or password.",
         ) from exception

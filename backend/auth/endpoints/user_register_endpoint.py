@@ -18,33 +18,33 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLogged
 
 
 @route.post(
-    path='/signup',
-    summary='User registration endpoint.',
-    description='It allows the registration of new users.',
+    path="/signup",
+    summary="User registration endpoint.",
+    description="It allows the registration of new users.",
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {
-            'model': UserCreatedSchema,
+            "model": UserCreatedSchema,
         },
         status.HTTP_400_BAD_REQUEST: {
-            'content': {
-                'application/json': {
-                    'example': {
-                        'error': {
-                            'title': 'UserUsernameContainsInvalidCharactersError',
-                            'message': 'UserUsername value <<<johndoe#>>> contains invalid characters. Only alphanumeric characters and underscores are allowed.',  # noqa: E501
+            "content": {
+                "application/json": {
+                    "example": {
+                        "error": {
+                            "title": "UserUsernameContainsInvalidCharactersError",
+                            "message": "UserUsername value <<<johndoe#>>> contains invalid characters. Only alphanumeric characters and underscores are allowed.",  # noqa: E501
                         }
                     },
                 },
             },
         },
         status.HTTP_401_UNAUTHORIZED: {
-            'content': {
-                'application/json': {
-                    'example': {
-                        'error': {
-                            'title': 'Unauthorized',
-                            'message': 'Cannot be authenticated to access this resource',
+            "content": {
+                "application/json": {
+                    "example": {
+                        "error": {
+                            "title": "Unauthorized",
+                            "message": "Cannot be authenticated to access this resource",
                         },
                     }
                 }

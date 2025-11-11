@@ -53,8 +53,8 @@ class PostgreSQLUserActions(UserActions):
         parameters: dict[str, Any] = {}
 
         for index, condition in enumerate(conditions):
-            query += f' AND {condition.field} {condition.operator} %(param_{index})s'
-            parameters[f'param_{index}'] = condition.value
+            query += f" AND {condition.field} {condition.operator} %(param_{index})s"
+            parameters[f"param_{index}"] = condition.value
 
         results = self.__connection.search_all(query, parameters, User)
 
@@ -73,19 +73,19 @@ class PostgreSQLUserActions(UserActions):
             UserNotFoundError: If no User with the specified ID is found.
         """
         if not user.id:
-            raise ValueError('User ID is mandatory and cannot be None.')
+            raise ValueError("User ID is mandatory and cannot be None.")
 
-        users = self.search([Condition('id', SQLOperation.EQUAL, user.id)])
+        users = self.search([Condition("id", SQLOperation.EQUAL, user.id)])
         if not users:
-            raise UserNotFoundError(field='id', value=user.id)
+            raise UserNotFoundError(field="id", value=user.id)
 
         set_fragments: list[Composed] = []
         for key, value in user.to_dict().items():
-            if value is not None and key != 'id':
-                set_fragments.append(SQL('{} = {}').format(Identifier(key), Placeholder(key)))
+            if value is not None and key != "id":
+                set_fragments.append(SQL("{} = {}").format(Identifier(key), Placeholder(key)))
 
         if not set_fragments:
-            raise ValueError('No valid fields to update were provided.')
+            raise ValueError("No valid fields to update were provided.")
 
         query: Composed = SQL(
             """
@@ -93,7 +93,7 @@ class PostgreSQLUserActions(UserActions):
             SET {set_clause}
             WHERE id = {id_placeholder}
             """
-        ).format(set_clause=SQL(', ').join(set_fragments), id_placeholder=Placeholder('id'))
+        ).format(set_clause=SQL(", ").join(set_fragments), id_placeholder=Placeholder("id"))
 
         self.__connection.execute(query=query, parameters=user.to_dict())
 
@@ -111,9 +111,10 @@ class PostgreSQLUserActions(UserActions):
         """
         try:
             if not user.to_dict():
-                raise ValueError('No valid fields to insert were provided.')
+                raise ValueError("No valid fields to insert were provided.")
 
-            query: Composed = SQL("""
+            query: Composed = SQL(
+                """
                 INSERT INTO "user" (
                     id, name, username, email, password, role_id, create_date, update_date
                 )
@@ -122,20 +123,21 @@ class PostgreSQLUserActions(UserActions):
                     {email_placeholder}, {password_placeholder}, {role_id_placeholder}, {create_date_placeholder},
                     {update_date_placeholder}
                 )
-            """).format(
-                id_placeholder=Placeholder('id'),
-                name_placeholder=Placeholder('name'),
-                username_placeholder=Placeholder('username'),
-                email_placeholder=Placeholder('email'),
-                password_placeholder=Placeholder('password'),
-                role_id_placeholder=Placeholder('role_id'),
-                create_date_placeholder=Placeholder('create_date'),
-                update_date_placeholder=Placeholder('update_date'),
+            """
+            ).format(
+                id_placeholder=Placeholder("id"),
+                name_placeholder=Placeholder("name"),
+                username_placeholder=Placeholder("username"),
+                email_placeholder=Placeholder("email"),
+                password_placeholder=Placeholder("password"),
+                role_id_placeholder=Placeholder("role_id"),
+                create_date_placeholder=Placeholder("create_date"),
+                update_date_placeholder=Placeholder("update_date"),
             )
 
             self.__connection.execute(query=query, parameters=user.to_dict())
         except UniqueViolation as exception:
-            raise UserAlreadyExistsError(field='username', value=user.username) from exception
+            raise UserAlreadyExistsError(field="username", value=user.username) from exception
 
     @override
     def delete(self, user: User) -> None:
@@ -149,10 +151,12 @@ class PostgreSQLUserActions(UserActions):
             UserNotFoundError: If the User is not found.
         """
         try:
-            query: Composed = SQL("""
+            query: Composed = SQL(
+                """
                 DELETE FROM "user"
                 WHERE id = {id_placeholder}
-            """).format(id_placeholder=Placeholder('id'))
+            """
+            ).format(id_placeholder=Placeholder("id"))
             self.__connection.execute(query=query, parameters=user.to_dict())
         except NoRowAffectedError as exception:
-            raise UserNotFoundError(field='id', value=user.id) from exception
+            raise UserNotFoundError(field="id", value=user.id) from exception
