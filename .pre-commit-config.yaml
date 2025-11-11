@@ -37,6 +37,7 @@ repos:
       - id: name-tests-test
         name: "🧪 Test Files Checker"
         files: '.*test.*\.py'
+        exclude: '^tests/.*/mothers/.*\.py$|^tests/.*/actions/.*\.py$'
         args: [--pytest-test-first]
         stages: [pre-commit]
 
