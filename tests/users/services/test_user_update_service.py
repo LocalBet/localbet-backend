@@ -65,7 +65,7 @@ def test_user_update_email() -> None:
     user_update_service = UserUpdateService(action=user_actions)
 
     user = UserMother.create()
-    new_email = f"{WordMother.random()}@example.com"
+    new_email = f"{WordMother.of_length(length=5)}@example.com"
 
     before_update = datetime.now(tz=UTC)
     user_update_service.update(user=user, email=new_email)
@@ -215,7 +215,7 @@ def test_user_update_multiple_fields() -> None:
     user = UserMother.create()
     new_username = UserUsernameMother.of_length(length=4)
     new_email = EmailMother.random()
-    new_name = WordMother.random()
+    new_name = UserNameMother.of_length(length=4)
 
     before_update = datetime.now(tz=UTC)
     user_update_service.update(user=user, username=new_username, email=new_email, name=new_name)
