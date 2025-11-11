@@ -78,7 +78,7 @@ class UserPassword(ValueObject[str]):
             UserPasswordContainsInvalidCharactersError: If the value contains invalid characters.
             UserPasswordContainsInvalidCharactersError: If the value contains leading or trailing whitespaces.
         """
-        if type(value) is not str:
+        if type(value) is not str or value.strip() == '':
             raise UserPasswordTypeError()
 
         if len(value) < self.__USER_PASSWORD_MIN_LENGTH:
