@@ -19,8 +19,8 @@ class UserUsername(ValueObject[str]):
     UserUsername value object.
     """
 
-    __USER_USERNAME_MIN_LENGTH = 3
-    __USER_USERNAME_MAX_LENGTH = 32
+    __USER_USERNAME_MIN_LENGTH: int = 3
+    __USER_USERNAME_MAX_LENGTH: int = 32
 
     @override
     def _validate(self, value: str) -> None:
