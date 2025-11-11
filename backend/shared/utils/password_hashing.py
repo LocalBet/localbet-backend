@@ -4,7 +4,7 @@ Password hashing utilities.
 
 from enum import StrEnum, unique
 from secrets import SystemRandom
-from typing import Annotated, assert_never
+from typing import Annotated
 
 from argon2 import PasswordHasher, Type
 from argon2.exceptions import VerifyMismatchError
@@ -114,18 +114,17 @@ def password_hashing(
             salt=bytes(salt if salt is not None else random_salt(), encoding="utf-8"),
         )
 
-    elif kdf_algorithm == KDFAlgorithm.ARGON2D:
+    if kdf_algorithm == KDFAlgorithm.ARGON2D:
         return PasswordHasher(type=Type.D).hash(
             password=bytes(data, encoding="utf-8"),
             salt=bytes(salt if salt is not None else random_salt(), encoding="utf-8"),
         )
-    elif kdf_algorithm == KDFAlgorithm.ARGON2I:
+
+    if kdf_algorithm == KDFAlgorithm.ARGON2I:
         return PasswordHasher(type=Type.I).hash(
             password=bytes(data, encoding="utf-8"),
             salt=bytes(salt if salt is not None else random_salt(), encoding="utf-8"),
         )
-    else:
-        assert_never(kdf_algorithm)
 
 
 @validate_call

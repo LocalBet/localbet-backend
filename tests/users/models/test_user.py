@@ -200,7 +200,7 @@ def test_user_create_date_setter() -> None:
 
     assert user.create_date == original_create_date
 
-
+@mark.unit_testing
 def test_user_role_id_setter() -> None:
     """
     Test user role_id can be updated via setter.

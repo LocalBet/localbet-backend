@@ -3,6 +3,7 @@ SQL condition operations.
 """
 
 from typing import Any, Generic, TypeVar
+from typing_extensions import override
 
 from pydantic import model_validator
 
@@ -35,6 +36,26 @@ class Condition(Generic[T], DataModel):
         self.__field = field
         self.__operator = operator
         self.__value = value
+
+    @override
+    def __eq__(self, other: object) -> bool:
+        """
+        Equality comparison between two Condition objects.
+
+        Args:
+            other (object): The other object to compare with.
+
+        Returns:
+            bool: True if both Condition objects are equal, False otherwise.
+        """
+        if not isinstance(other, Condition):
+            return NotImplemented
+
+        return (
+            self.field == other.field
+            and self.operator == other.operator
+            and self.value == other.value
+        )
 
     @property
     def field(self) -> str:

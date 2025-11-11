@@ -46,7 +46,7 @@ class UserUsername(ValueObject[str]):
         if len(value) > self.__USER_USERNAME_MAX_LENGTH:
             raise UserUsernameMaxLengthError(username=value, max_length=self.__USER_USERNAME_MAX_LENGTH)
 
-        if not value.isalnum() and "_" not in value:
+        if not value.replace("_", "").isalnum():
             raise UserUsernameContainsInvalidCharactersError(username=value)
 
         if not value.islower():
