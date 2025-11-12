@@ -33,6 +33,13 @@ class _Settings(BaseSettings):
     FRONTEND_URL: str = Field(default=..., min_length=1)
     LOG_LEVEL: LogLevel = Field(default=LogLevel.INFO, description="The logging level to use.")
 
+    # Security Variables
+    SECRET_KEY: str = Field(default=..., min_length=1)
+    ACCESS_TOKEN_EXPIRATION_TIME: int = Field(default=..., ge=0)  # Time in seconds
+    ACCESS_TOKEN_NOT_BEFORE_TIME: int = Field(default=..., ge=0)  # Time in seconds
+    REFRESH_TOKEN_EXPIRATION_TIME: int = Field(default=..., ge=0)  # Time in seconds
+    REFRESH_TOKEN_NOT_BEFORE_TIME: int = Field(default=..., ge=0)  # Time in seconds
+
     # Database Variables
     DATABASE_USERNAME: str = Field(default=..., min_length=1)
     DATABASE_PASSWORD: str = Field(default=..., min_length=1)

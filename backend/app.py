@@ -11,9 +11,18 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from backend.auth.endpoints import router as auth_router
 from backend.database import pool
 from backend.settings import Settings
 from backend.shared.infrastructure.errors import ExtraFieldsError, HTTPError, MissingFieldsError
+from backend.shared.infrastructure.middlewares import (
+    AcceptHeaderMiddleware,
+    ContentTypeMiddleware,
+    MaxHeaderLengthMiddleware,
+    MaxPayloadLengthMiddleware,
+    MaxUriLengthMiddleware,
+)
+from backend.users.endpoints import router as users_router
 
 # Logging configuration
 LOGGER: Logger = getLogger(__name__)
@@ -38,12 +47,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
 
 app = FastAPI(title=Settings.APPLICATION_NAME, version="1.0.0", docs_url="/docs", redoc_url=None, lifespan=lifespan)
 
-# Routers
+app.include_router(router=auth_router, prefix="/auth", tags=["Authentication"])
+app.include_router(router=users_router, prefix="/users", tags=["Users"])
 
-#
+app.add_middleware(middleware_class=MaxUriLengthMiddleware)
+app.add_middleware(middleware_class=MaxHeaderLengthMiddleware)
+app.add_middleware(middleware_class=MaxPayloadLengthMiddleware)
+app.add_middleware(middleware_class=ContentTypeMiddleware)
+app.add_middleware(middleware_class=AcceptHeaderMiddleware)
 app.add_middleware(
     middleware_class=CORSMiddleware,
-    allow_origins=Settings.FRONTEND_URL,
+    allow_origins=[Settings.FRONTEND_URL],
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization"],
     allow_credentials=True,

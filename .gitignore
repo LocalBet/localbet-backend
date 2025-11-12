@@ -8,3 +8,4 @@ app.conf
 **topics**
 **pycache**
 **logs**
+**.coverage**

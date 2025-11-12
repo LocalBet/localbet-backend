@@ -15,3 +15,12 @@ fastapi==0.115.6  # https://fastapi.tiangolo.com
 
 # uvicorn is an ASGI server for running FastAPI applications.
 uvicorn==0.32.1  # https://www.uvicorn.org
+
+# PyJWT is a Python library for creating and verifying JSON Web Tokens (JWT).
+pyjwt[crypto]==2.8.0  # https://github.com/jpadilla/pyjwt
+
+# Authlib is a library for building OAuth and OpenID Connect clients and servers.
+Authlib>=1.0.0,<2.0.0  # https://docs.authlib.org
+
+# argon2-cffi is a library for secure password hashing using the Argon2 algorithm.
+argon2-cffi==25.1.0  # https://argon2-cffi.readthedocs.io/en/stable
