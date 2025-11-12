@@ -1,6 +1,8 @@
 # Directories to ignore
 **.vscode**
 **.venv**
+venv/
+.venv/
 .env
 app.conf
 **topics**
