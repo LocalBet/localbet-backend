@@ -61,7 +61,7 @@ class UserUpdateService:
         ):
             self.__ensure_passwords_match(password=new_password, password_verification=new_password_confirmation)  # type: ignore[arg-type]
             self.__ensure_user_password_matches(user=user, password=old_password)  # type: ignore[arg-type]
-        server_hash = hash(user)
+        user_hash = hash(user)
 
         if username is not None:
             user.username = username
@@ -82,7 +82,7 @@ class UserUpdateService:
             )  # TODO: Use the finder service of Role when it is implemented and raise RoleNotFoundError if not found
             user.role_id = role_id
 
-        if hash(user) == server_hash:
+        if hash(user) == user_hash:
             return
 
         user.update_date = datetime.now(UTC)

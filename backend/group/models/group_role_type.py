@@ -8,7 +8,7 @@ from uuid import UUID
 from backend.shared.models import DataModel
 from backend.group_roles_type.models import GroupRoleTypeId, GroupRoleTypeName, GroupRoleTypeDescription, GroupRoleTypeCreatedDate, GroupRoleTypeUpdateDate, GroupRoleTypeGroupId
 
-class GroupRoleType(DataModel):
+class Group(DataModel):
     """Simple GroupRoleType domain model."""
 
     __id: GroupRoleTypeId

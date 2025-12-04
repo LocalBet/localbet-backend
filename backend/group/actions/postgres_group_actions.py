@@ -3,7 +3,6 @@ PostgreSQL GroupRoleType action.
 """
 
 from typing import Any
-
 from typing_extensions import override
 
 from psycopg.errors import UniqueViolation
@@ -17,9 +16,9 @@ from backend.group_roles_type.errors import GroupRoleTypeAlreadyExistsError, Gro
 from backend.group_roles_type.models import GroupRoleType
 
 
-class PostgreSQLGroupRoleTypeActions(GroupRoleTypeActions):
+class PostgreSQLGroupActions(GroupRoleTypeActions):
     """
-    PostgreSQL GroupRoleType actions class.
+    PostgreSQL Group actions class.
     """
 
     __connection: PostgreSqlConnection
@@ -143,14 +142,13 @@ class PostgreSQLGroupRoleTypeActions(GroupRoleTypeActions):
         Delete a GroupRoleType from the action.
 
         Args:
-            group_role_type (GroupRoleType): Group role type to delete.
+            group_role_type (GroupRoleType): User to delete.
 
         Raises:
             GroupRoleTypeNotFoundError: If the User is not found.
         """
+        # TODO: Check if containe any user a role group member
         try:
-            self._ensure_none_exist_user_with_selected_role(group_role_type=group_role_type)
-
             query: Composed = SQL(
                 """
                 DELETE FROM "group_role_type"
@@ -160,22 +158,3 @@ class PostgreSQLGroupRoleTypeActions(GroupRoleTypeActions):
             self.__connection.execute(query=query, parameters=group_role_type.to_dict())
         except NoRowAffectedError as exception:
             raise GroupRoleTypeNotFoundError(field="id", value=group_role_type.id) from exception
-
-    def _ensure_none_exist_user_with_selected_role(self, group_role_type: GroupRoleType) -> None:
-        """
-        Ensure that none exist user inside the group with selected role to delete it.
-
-        Args:
-            group_role_type (GroupRoleType): Group role type.
-        """
-        query: Composed = SQL(
-            """
-            SELECT count(*) from "group_role_user" where group_id = {id_placeholder}
-            """
-        ).format(
-            id_placeholder=Placeholder("id")
-        )
-        self.__connection.count(
-            query=query, parameters=group_role_type.to_dict()
-        )
-
