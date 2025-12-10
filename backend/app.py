@@ -23,6 +23,7 @@ from backend.shared.infrastructure.middlewares import (
     MaxUriLengthMiddleware,
 )
 from backend.users.endpoints import router as users_router
+from backend.bets.endpoints import router as bets_router
 
 # Logging configuration
 LOGGER: Logger = getLogger(__name__)
@@ -49,6 +50,7 @@ app = FastAPI(title=Settings.APPLICATION_NAME, version="1.0.0", docs_url="/docs"
 
 app.include_router(router=auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(router=users_router, prefix="/users", tags=["Users"])
+app.include_router(router=bets_router, prefix="/bets", tags=["Bets"])
 
 app.add_middleware(middleware_class=MaxUriLengthMiddleware)
 app.add_middleware(middleware_class=MaxHeaderLengthMiddleware)
