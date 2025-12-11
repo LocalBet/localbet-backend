@@ -24,6 +24,7 @@ from backend.shared.infrastructure.middlewares import (
 )
 from backend.users.endpoints import router as users_router
 from backend.bets.endpoints import router as bets_router
+from backend.groups.endpoints import router as groups_router  # Afegim els endpoints de grups
 
 # Logging configuration
 LOGGER: Logger = getLogger(__name__)
@@ -48,10 +49,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
 
 app = FastAPI(title=Settings.APPLICATION_NAME, version="1.0.0", docs_url="/docs", redoc_url=None, lifespan=lifespan)
 
+# Incloem els endpoints de les diferents funcionalitats
 app.include_router(router=auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(router=users_router, prefix="/users", tags=["Users"])
 app.include_router(router=bets_router, prefix="/bets", tags=["Bets"])
+app.include_router(router=groups_router, prefix="/groups", tags=["Groups"])  # Incloem el router de grups
 
+# Afegim les capçaleres de seguretat i altres middleware
 app.add_middleware(middleware_class=MaxUriLengthMiddleware)
 app.add_middleware(middleware_class=MaxHeaderLengthMiddleware)
 app.add_middleware(middleware_class=MaxPayloadLengthMiddleware)
