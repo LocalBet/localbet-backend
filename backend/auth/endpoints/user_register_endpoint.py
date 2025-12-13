@@ -23,20 +23,18 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLogged
     description="It allows the registration of new users.",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {
-            "model": UserCreatedSchema,
-        },
+        status.HTTP_201_CREATED: {"model": UserCreatedSchema},
         status.HTTP_400_BAD_REQUEST: {
             "content": {
                 "application/json": {
                     "example": {
                         "error": {
                             "title": "UserUsernameContainsInvalidCharactersError",
-                            "message": "UserUsername value <<<johndoe#>>> contains invalid characters. Only alphanumeric characters and underscores are allowed.",  # noqa: E501
+                            "message": "UserUsername value <<<johndoe#>>> contains invalid characters. Only alphanumeric characters and underscores are allowed.",
                         }
-                    },
-                },
-            },
+                    }
+                }
+            }
         },
         status.HTTP_401_UNAUTHORIZED: {
             "content": {
@@ -45,10 +43,10 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLogged
                         "error": {
                             "title": "Unauthorized",
                             "message": "Cannot be authenticated to access this resource",
-                        },
+                        }
                     }
                 }
-            },
+            }
         },
     },
 )
@@ -67,11 +65,9 @@ async def user_registration(registration_data: CreateUserSchema) -> UserCreatedS
             user_action = PostgreSQLUserActions(connection=database_connection)
             user_register_service = UserRegisterService(actions=user_action)
 
+            # ✅ Simplificat: només 3 camps (+ verification)
             user_register_service.register(
-                id=registration_data.id,
-                name=registration_data.name,
                 username=registration_data.username,
-                role_id=registration_data.role_id,
                 email=registration_data.email,
                 password=registration_data.password,
                 password_verification=registration_data.password_verification,
@@ -84,7 +80,12 @@ async def user_registration(registration_data: CreateUserSchema) -> UserCreatedS
             message=exception.message,
         ) from exception
 
-    except UserAlreadyExistsError:
-        pass
+    except UserAlreadyExistsError as exception:
+        # millor retornar 400 amb missatge
+        raise HTTPError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            title=exception.__class__.__name__,
+            message=exception.message,
+        ) from exception
 
     return UserCreatedSchema()

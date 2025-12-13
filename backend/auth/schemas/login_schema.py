@@ -12,10 +12,10 @@ class LoginSchema(BaseRequestSchema):
     Schema for the user login data.
     """
 
-    email: str = Field(
+    username: str = Field(
         default=...,
-        description="The user's email address.",
-        examples=["joedoesmith@example.com"],
+        description="The user's username.",
+        examples=["johndoesmith"],
     )
 
     password: str = Field(

@@ -3,13 +3,23 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import List
 
+from backend.bets.schemas.bet_get_schema import BetGetSchema
+
+
 class GroupGetSchema(BaseModel):
     id: UUID = Field(..., description="Group ID")
     name: str = Field(..., description="Group name")
     create_date: datetime = Field(..., description="Date when the group was created")
     update_date: datetime = Field(..., description="Date when the group was last updated")
-    members: List[UUID] = Field(..., description="List of user IDs who are members of the group")
-    admin_id: UUID = Field(..., description="The user ID of the group admin")
+
+    # ✅ ara usernames
+    members: List[str] = Field(..., description="List of usernames who are members of the group")
+
+    # ✅ ara username (no UUID)
+    admin_username: str = Field(..., description="The username of the group admin")
+
+    # ✅ nou
+    bets: List[BetGetSchema] = Field(default_factory=list, description="List of bets in the group")
 
     class Config:
         schema_extra = {
@@ -18,10 +28,8 @@ class GroupGetSchema(BaseModel):
                 "name": "Football Lovers",
                 "create_date": "2025-12-11T10:00:00Z",
                 "update_date": "2025-12-11T10:30:00Z",
-                "members": [
-                    "d71a63eb-3d8d-4259-a026-49bb2c3d9fa3",
-                    "a76b63cb-3d8d-4259-a026-49bb2c3d9fa3"
-                ],
-                "admin_id": "d71a63eb-3d8d-4259-a026-49bb2c3d9fa3",
+                "members": ["genis2", "marta"],
+                "admin_username": "genis2",
+                "bets": [],
             }
         }

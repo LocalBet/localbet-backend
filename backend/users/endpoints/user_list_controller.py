@@ -16,6 +16,7 @@ from backend.users.schemas import UserGetSchema
 
 route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustBeLoggedMiddleware]))
 
+
 @route.get(
     path="/",
     summary="Get all users (admin only).",
@@ -29,7 +30,7 @@ async def get_all_users(
     offset: int = Query(default=0, ge=0),
 ) -> List[UserGetSchema]:
     """
-    Retrieve all users from the database. Only accessible to admins.
+    Retrieve all users from the database.
 
     Args:
         request (Request): The incoming HTTP request.
@@ -39,8 +40,6 @@ async def get_all_users(
     Returns:
         List[UserGetSchema]: Paginated list of users.
     """
-    logged_user = request.state.logged_user
-
     with get_database_connection() as database_connection:
         actions = PostgreSQLUserActions(connection=database_connection)
         service = UserFinderService(action=actions)
@@ -50,6 +49,6 @@ async def get_all_users(
         except UserNotFoundError:
             raise HTTPException(status_code=404, detail="No users found")
 
-        paginated = users[offset: offset + limit]
+        paginated = users[offset : offset + limit]
 
     return [UserGetSchema(**u.to_dict()) for u in paginated]

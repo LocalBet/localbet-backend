@@ -9,6 +9,7 @@ from backend.database import get_database_connection
 
 route = APIRouter()
 
+
 @route.get(
     path="/",
     summary="Get a list of all groups.",
@@ -17,16 +18,14 @@ route = APIRouter()
     status_code=status.HTTP_200_OK,
 )
 async def list_groups(request: Request) -> list[GroupGetSchema]:
-    """
-    List all groups.
-
-    Args:
-        request (Request): The request object.
-
-    Returns:
-        List[GroupGetSchema]: A list of groups.
-    """
     with get_database_connection() as connection:
-        group_service = GroupService(connection)  # Assuming the GroupService is connected to the database
-        groups = group_service.get_all()  # Get all groups (you will need to implement this in the service)
-        return [GroupGetSchema(**group.to_dict()) for group in groups]
+        group_service = GroupService(connection)
+        groups = group_service.get_all()
+
+        result: list[GroupGetSchema] = []
+        for group in groups:
+            data = group.to_dict()
+            data.setdefault("bets", [])
+            result.append(GroupGetSchema(**data))
+
+        return result

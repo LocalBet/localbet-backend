@@ -5,7 +5,7 @@ PostgreSQL connection module.
 from __future__ import annotations
 
 from types import TracebackType
-from typing import Any, Self, TypeVar
+from typing import Any, Self, TypeVar, overload, Literal
 
 from psycopg import Connection, sql
 from psycopg.sql import SQL, Composed
@@ -40,7 +40,6 @@ class PostgreSqlConnection:
             Self: The postgresql connection instance.
         """
         self.__connection.__enter__()
-
         return self
 
     def __exit__(
@@ -59,48 +58,60 @@ class PostgreSqlConnection:
         """
         self.__connection.__exit__(exc_type, exc_value, traceback)
 
-    def search_one(self, query: str, parameters: dict[str, Any], model: type[T]) -> T | None:
+    # ---------- SEARCH ONE ----------
+
+    @overload
+    def search_one(self, query: str, parameters: dict[str, Any], model: type[T]) -> T | None: ...
+    @overload
+    def search_one(self, query: str, parameters: dict[str, Any], model: type[dict]) -> dict[str, Any] | None: ...
+
+    def search_one(self, query: str, parameters: dict[str, Any], model: type[Any]) -> Any | None:
         """
         Execute a query and return the first result.
 
-        Args:
-            query (str): SQL query to execute.
-            parameters (dict[str, Any]): Parameters to inject into the query (this is to prevent SQL injection).
-            model (type[T]): Model to convert the result to.
-
-        Returns:
-            T | None: If the query returns a row, it will return the converted model, otherwise None.
+        If model is a DataModel -> returns model instance.
+        If model is dict -> returns primitives dict.
         """
         result: dict[str, Any] | None = self.__connection.execute(sql.SQL(query), params=parameters).fetchone()  # type: ignore[assignment]
 
         if result is None:
             return None
 
+        # ✅ Allow returning raw primitives
+        if model is dict:
+            return result
+
         return model.from_dict(primitives=result)
 
-    def search_all(self, query: str, parameters: dict[str, Any], model: type[T]) -> list[T]:
+    # ---------- SEARCH ALL ----------
+
+    @overload
+    def search_all(self, query: str, parameters: dict[str, Any], model: type[T]) -> list[T]: ...
+    @overload
+    def search_all(self, query: str, parameters: dict[str, Any], model: type[dict]) -> list[dict[str, Any]]: ...
+
+    def search_all(self, query: str, parameters: dict[str, Any], model: type[Any]) -> list[Any]:
         """
         Execute a query and return all the results.
 
-        Args:
-            query (str): SQL query to execute.
-            parameters (dict[str, Any]): Parameters to inject into the query (this is to prevent SQL injection).
-            model (type[T]): Model to convert the result to.
-
-        Returns:
-            list[T]: List of models converted from the results.
+        If model is a DataModel -> returns list[model].
+        If model is dict -> returns list[dict] primitives.
         """
         result: list[dict[str, Any]] = self.__connection.execute(sql.SQL(query), params=parameters).fetchall()  # type: ignore[assignment]
 
+        # ✅ Allow returning raw primitives
+        if model is dict:
+            return result
+
         return [model.from_dict(primitives=primitives) for primitives in result]
 
-    def execute(self, query: SQL | Composed, parameters: dict[str, Any]) -> None:
+    def execute(self, query: SQL | Composed, parameters: dict[str, Any]) -> Any:
         """
         Execute a query with the given parameters.
 
         Args:
-            query (SQL | Composed): SQL query to execute. It can be a raw SQL string or a composed SQL statement.
-            parameters (dict[str, Any]): Parameters to inject into the query (this is to prevent SQL injection).
+            query (SQL | Composed): SQL query to execute.
+            parameters (dict[str, Any]): Parameters to inject into the query.
 
         Raises:
             NoRowAffectedError: If the query is an INSERT, UPDATE or DELETE and no row was affected.
@@ -110,3 +121,6 @@ class PostgreSqlConnection:
         query_str = query.as_string(self.__connection)
         if query_str.strip().upper().startswith(("INSERT", "UPDATE", "DELETE")) and result.rowcount == 0:
             raise NoRowAffectedError()
+
+        # ✅ Return result so callers can read rowcount if they want
+        return result

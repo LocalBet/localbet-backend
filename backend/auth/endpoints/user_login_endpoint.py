@@ -76,7 +76,8 @@ async def user_login(login_data: LoginSchema) -> AccessTokenSchema:
             user_searcher_service = UserFinderService(action=user_action)
             login_service = UserLoginService(actions=user_action, finder=user_searcher_service)
 
-            access_token, refresh_token = login_service.login(email=login_data.email, password=login_data.password)
+            access_token, refresh_token = login_service.login(username=login_data.username,
+                                                              password=login_data.password)
 
     except (UserNotFoundError, PasswordVerificationError) as exception:
         raise HTTPError(

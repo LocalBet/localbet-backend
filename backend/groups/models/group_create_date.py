@@ -2,12 +2,10 @@
 Group Created Date value object.
 """
 
-from backend.shared.models import ValueObject
-from datetime import datetime
+from backend.shared.models import Datetime
 
 
-class GroupCreateDate(ValueObject[datetime]):
+class GroupCreateDate(Datetime):
     """
-    Group Created Date value object.
+    GroupCreatedDate value object.
     """
-    pass

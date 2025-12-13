@@ -2,12 +2,10 @@
 Group Updated Date value object.
 """
 
-from backend.shared.models import ValueObject
-from datetime import datetime
+from backend.shared.models import Datetime
 
 
-class GroupUpdateDate(ValueObject[datetime]):
+class GroupUpdateDate(Datetime):
     """
-    Group Updated Date value object.
+    GroupUpdatedDate value object.
     """
-    pass

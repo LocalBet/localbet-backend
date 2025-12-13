@@ -2,12 +2,11 @@
 Group ID value object.
 """
 
-from backend.shared.models import ValueObject
-from uuid import UUID
+from backend.shared.models import ID
 
 
-class GroupId(ValueObject[UUID]):
+class GroupId(ID):
     """
-    Group ID value object.
+    GroupId value object.
+    Validation left...
     """
-    pass

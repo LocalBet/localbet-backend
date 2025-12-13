@@ -19,3 +19,12 @@ class BetActions(ABC):
     @abstractmethod
     def delete(self, bet: Bet) -> None:
         ...
+
+    # ✅ join dins d'un grup (validació group_bet + cobrar + amount += cost)
+    @abstractmethod
+    def join_bet_in_group(self, group_id: str, bet_id: str, username: str) -> None:
+        ...
+
+    @abstractmethod
+    def leave_bet(self, bet_id: str, username: str) -> None:
+        ...
