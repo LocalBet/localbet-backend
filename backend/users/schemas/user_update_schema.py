@@ -9,7 +9,7 @@ from backend.shared.schemas import BaseRequestSchema
 
 class UserUpdateSchema(BaseRequestSchema):
     """
-    Schema for updating an user.
+    Schema for updating a user (safe fields only).
     """
 
     username: str | None = Field(
@@ -22,6 +22,24 @@ class UserUpdateSchema(BaseRequestSchema):
         default=None,
         description="User email.",
         examples=["joedoesmith@example.com"],
+    )
+
+    full_name: str | None = Field(
+        default=None,
+        description="User full name.",
+        examples=["John Doe Smith"],
+    )
+
+    phone_number: str | None = Field(
+        default=None,
+        description="User phone number.",
+        examples=["+34612345678"],
+    )
+
+    country: str | None = Field(
+        default=None,
+        description="User country.",
+        examples=["ES"],
     )
 
     old_password: str | None = Field(

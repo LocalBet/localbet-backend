@@ -5,7 +5,7 @@ User registration endpoint.
 from fastapi import APIRouter, status
 
 from backend.auth.middlewares import UserMustNotBeLoggedMiddleware
-from backend.auth.schemas import CreateUserSchema, UserCreatedSchema
+from backend.auth.schemas import AccessTokenSchema, CreateUserSchema
 from backend.auth.services import UserRegisterService
 from backend.database import get_database_connection
 from backend.shared.errors import ValidationError
@@ -20,18 +20,32 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLogged
 @route.post(
     path="/signup",
     summary="User registration endpoint.",
-    description="It allows the registration of new users.",
+    description="Register new user with profile and legal data, returns tokens for auto-login.",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": UserCreatedSchema},
+        status.HTTP_201_CREATED: {"model": AccessTokenSchema},
         status.HTTP_400_BAD_REQUEST: {
             "content": {
                 "application/json": {
-                    "example": {
-                        "error": {
-                            "title": "UserUsernameContainsInvalidCharactersError",
-                            "message": "UserUsername value <<<johndoe#>>> contains invalid characters. Only alphanumeric characters and underscores are allowed.",
-                        }
+                    "examples": {
+                        "ValidationError": {
+                            "summary": "Validation Error",
+                            "value": {
+                                "error": {
+                                    "title": "ValidationError",
+                                    "message": "Must be at least 18 years old",
+                                }
+                            },
+                        },
+                        "UserAlreadyExists": {
+                            "summary": "User Already Exists",
+                            "value": {
+                                "error": {
+                                    "title": "UserAlreadyExistsError",
+                                    "message": "User with username/email already exists",
+                                }
+                            },
+                        },
                     }
                 }
             }
@@ -50,42 +64,46 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLogged
         },
     },
 )
-async def user_registration(registration_data: CreateUserSchema) -> UserCreatedSchema:
+async def user_registration(registration_data: CreateUserSchema) -> AccessTokenSchema:
     """
-    It allows to register a new user.
+    Register a new user with profile and legal compliance data.
 
     Args:
         registration_data (CreateUserSchema): Registration data.
 
     Returns:
-        UserCreatedSchema: If the user is registered successfully.
+        AccessTokenSchema: Access and refresh tokens for auto-login.
     """
     try:
         with get_database_connection() as database_connection:
             user_action = PostgreSQLUserActions(connection=database_connection)
             user_register_service = UserRegisterService(actions=user_action)
 
-            # ✅ Simplificat: només 3 camps (+ verification)
-            user_register_service.register(
+            access_token, refresh_token = user_register_service.register(
                 username=registration_data.username,
                 email=registration_data.email,
                 password=registration_data.password,
                 password_verification=registration_data.password_verification,
+                full_name=registration_data.full_name,
+                phone_number=registration_data.phone_number,
+                birth_date=registration_data.birth_date,
+                country=registration_data.country,
+                accepted_terms=registration_data.accepted_terms,
+                accepted_privacy_policy=registration_data.accepted_privacy_policy,
             )
 
-    except ValidationError as exception:
+    except (ValidationError, ValueError) as exception:
         raise HTTPError(
             status_code=status.HTTP_400_BAD_REQUEST,
             title=exception.__class__.__name__,
-            message=exception.message,
+            message=str(exception) if isinstance(exception, ValueError) else exception.message,
         ) from exception
 
     except UserAlreadyExistsError as exception:
-        # millor retornar 400 amb missatge
         raise HTTPError(
             status_code=status.HTTP_400_BAD_REQUEST,
             title=exception.__class__.__name__,
             message=exception.message,
         ) from exception
 
-    return UserCreatedSchema()
+    return AccessTokenSchema(access_token=access_token, refresh_token=refresh_token)

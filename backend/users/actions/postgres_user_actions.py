@@ -30,7 +30,11 @@ class PostgreSQLUserActions(UserActions):
     @override
     def search(self, conditions: list[Condition[DataModel]]) -> list[User]:
         query: str = """
-            SELECT username, email, password, coins
+            SELECT 
+                username, email, password, coins,
+                full_name, phone_number, birth_date, country,
+                accepted_terms, accepted_privacy_policy, is_adult, verified_at,
+                created_at, updated_at
             FROM "user"
             WHERE 1=1
         """
@@ -46,23 +50,38 @@ class PostgreSQLUserActions(UserActions):
     @override
     def save(self, user: User) -> None:
         """
-        Create a User in the DB.
-
-        IMPORTANT:
-        - We explicitly insert 'coins' to ensure consistency.
-        - This allows the application to control the initial value.
+        Create a User in the DB with all profile and legal fields.
         """
         try:
             query: Composed = SQL(
                 """
-                INSERT INTO "user" (username, email, password, coins)
-                VALUES ({username_placeholder}, {email_placeholder}, {password_placeholder}, {coins_placeholder})
-                """
+                INSERT INTO "user" (id,
+                                    username, email, password, coins,
+                                    full_name, phone_number, birth_date, country,
+                                    accepted_terms, accepted_privacy_policy, is_adult,
+                                    created_at, updated_at)
+                VALUES ({id},
+                           {username}, {email}, {password}, {coins},
+                           {full_name}, {phone_number}, {birth_date}, {country},
+                           {accepted_terms}, {accepted_privacy_policy}, {is_adult},
+                           {created_at}, {updated_at}
+            )
+            """
             ).format(
-                username_placeholder=Placeholder("username"),
-                email_placeholder=Placeholder("email"),
-                password_placeholder=Placeholder("password"),
-                coins_placeholder=Placeholder("coins"),
+                id=Placeholder("id"),
+                username=Placeholder("username"),
+                email=Placeholder("email"),
+                password=Placeholder("password"),
+                coins=Placeholder("coins"),
+                full_name=Placeholder("full_name"),
+                phone_number=Placeholder("phone_number"),
+                birth_date=Placeholder("birth_date"),
+                country=Placeholder("country"),
+                accepted_terms=Placeholder("accepted_terms"),
+                accepted_privacy_policy=Placeholder("accepted_privacy_policy"),
+                is_adult=Placeholder("is_adult"),
+                created_at=Placeholder("created_at"),
+                updated_at=Placeholder("updated_at"),
             )
 
             self.__connection.execute(query=query, parameters=user.to_dict())
@@ -73,23 +92,24 @@ class PostgreSQLUserActions(UserActions):
     @override
     def update(self, user: User) -> None:
         """
-        Update a User in the DB (by username).
-
-        Note:
-        - If user.to_dict() includes 'coins', it can be updated here
-          (useful for spending coins when creating bets).
+        Update a User in the DB using the primary key (id).
         """
-        if not user.username:
-            raise ValueError("Username is mandatory and cannot be None.")
+        if not user.id:
+            raise ValueError("User ID is mandatory and cannot be None.")
 
-        users = self.search([Condition("username", "=", user.username)])
+        users = self.search([Condition("id", SQLOperation.EQUAL, user.id)])
         if not users:
-            raise UserNotFoundError(field="username", value=user.username)
+            raise UserNotFoundError(field="id", value=user.id)
 
         set_fragments: list[Composed] = []
         for key, value in user.to_dict().items():
-            if value is not None and key != "username":
-                set_fragments.append(SQL("{} = {}").format(Identifier(key), Placeholder(key)))
+            if value is not None and key != "id":
+                set_fragments.append(
+                    SQL("{} = {}").format(Identifier(key), Placeholder(key))
+                )
+
+        # Always update updated_at
+        set_fragments.append(SQL("updated_at = NOW()"))
 
         if not set_fragments:
             return
@@ -98,11 +118,11 @@ class PostgreSQLUserActions(UserActions):
             """
             UPDATE "user"
             SET {set_clause}
-            WHERE username = {username_placeholder}
+            WHERE id = {id_placeholder}
             """
         ).format(
             set_clause=SQL(", ").join(set_fragments),
-            username_placeholder=Placeholder("username"),
+            id_placeholder=Placeholder("id"),
         )
 
         self.__connection.execute(query=query, parameters=user.to_dict())

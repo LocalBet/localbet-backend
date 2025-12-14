@@ -19,7 +19,7 @@ class UserPassword(ValueObject[str]):
     UserPassword value object.
     """
 
-    __USER_PASSWORD_MIN_LENGTH: int = 12
+    __USER_PASSWORD_MIN_LENGTH: int = 8
     __USER_PASSWORD_MAX_LENGTH: int = 150
 
     @override
