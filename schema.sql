@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS "user" (
   username TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  coins NUMERIC NOT NULL DEFAULT 100,
+  coins INTEGER NOT NULL DEFAULT 500,
   CONSTRAINT user_coins_non_negative CHECK (coins >= 0)
 );
 

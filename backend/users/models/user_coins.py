@@ -5,16 +5,16 @@ UserCoins value object.
 from backend.shared.models import ValueObject
 
 
-class UserCoins(ValueObject[float]):
+class UserCoins(ValueObject[int]):
     """
-    User coins value object.
+    User coins value object (discrete integer).
     """
 
-    def _validate(self, value: float) -> None:
+    def _validate(self, value: int) -> None:
         try:
-            v = float(value)
+            v = int(value)
         except (TypeError, ValueError) as e:
-            raise TypeError("UserCoins must be a number") from e
+            raise TypeError("UserCoins must be an integer") from e
 
         if v < 0:
             raise ValueError("UserCoins cannot be negative")

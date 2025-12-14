@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 
 from backend.auth.endpoints import router as auth_router
 from backend.database import pool
-from backend.db_init import init_db  # ✅ NOU
+from backend.db_init import init_db
 from backend.settings import Settings
 from backend.shared.infrastructure.errors import ExtraFieldsError, HTTPError, MissingFieldsError
 from backend.shared.infrastructure.middlewares import (
@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     pool.open()
 
     # ✅ Inicialitza la base de dades (crea taules si no existeixen)
-    init_db()
+    # init_db()
 
     yield
 

@@ -52,6 +52,7 @@ class UserRegisterService:
             username=username,
             email=email,
             password=password,
+            coins=500,  # All new users start with 500 coins
         )
 
         self.__actions.save(user=user)

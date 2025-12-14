@@ -49,19 +49,20 @@ class PostgreSQLUserActions(UserActions):
         Create a User in the DB.
 
         IMPORTANT:
-        - We DO NOT insert 'coins' here.
-        - The DB sets it using DEFAULT 100 (schema.sql).
+        - We explicitly insert 'coins' to ensure consistency.
+        - This allows the application to control the initial value.
         """
         try:
             query: Composed = SQL(
                 """
-                INSERT INTO "user" (username, email, password)
-                VALUES ({username_placeholder}, {email_placeholder}, {password_placeholder})
+                INSERT INTO "user" (username, email, password, coins)
+                VALUES ({username_placeholder}, {email_placeholder}, {password_placeholder}, {coins_placeholder})
                 """
             ).format(
                 username_placeholder=Placeholder("username"),
                 email_placeholder=Placeholder("email"),
                 password_placeholder=Placeholder("password"),
+                coins_placeholder=Placeholder("coins"),
             )
 
             self.__connection.execute(query=query, parameters=user.to_dict())

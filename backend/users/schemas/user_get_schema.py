@@ -23,8 +23,8 @@ class UserGetSchema(BaseModel):
     )
 
 
-    coins: float = Field(
+    coins: int = Field(
         default=...,
         description="User coins.",
-        examples=[100.0]
+        examples=[500]
     )

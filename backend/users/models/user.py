@@ -25,7 +25,7 @@ class User(DataModel):
 
     __hash__ = DataModel.__hash__
 
-    def __init__(self, username: str, email: str, password: str, coins: float = 0) -> None:
+    def __init__(self, username: str, email: str, password: str, coins: int = 500) -> None:
         """
         User domain model constructor.
 
@@ -33,7 +33,7 @@ class User(DataModel):
             username (str): User username.
             email (str): User email.
             password (str): User password.
-            coins (float): User available coins.
+            coins (int): User available coins (default: 500).
         """
         self.__username = UserUsername(value=username)
         self.__email = UserEmail(value=email)
@@ -82,21 +82,21 @@ class User(DataModel):
         self.__password = UserPassword(value=value)
 
     @property
-    def coins(self) -> float:
-        return float(self.__coins.value)
+    def coins(self) -> int:
+        return int(self.__coins.value)
 
     @coins.setter
-    def coins(self, value: float) -> None:
+    def coins(self, value: int) -> None:
         self.__coins = UserCoins(value=value)
 
-    def add_coins(self, amount: float) -> None:
-        self.coins = self.coins + float(amount)
+    def add_coins(self, amount: int) -> None:
+        self.coins = self.coins + int(amount)
 
-    def spend_coins(self, amount: float) -> None:
-        amount_f = float(amount)
-        if self.coins < amount_f:
+    def spend_coins(self, amount: int) -> None:
+        amount_i = int(amount)
+        if self.coins < amount_i:
             raise ValueError("Not enough coins")
-        self.coins = self.coins - amount_f
+        self.coins = self.coins - amount_i
 
     def check_password(self, plain_password: str) -> bool:
         """
