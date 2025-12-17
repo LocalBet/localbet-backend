@@ -24,3 +24,6 @@ Authlib>=1.0.0,<2.0.0  # https://docs.authlib.org
 
 # argon2-cffi is a library for secure password hashing using the Argon2 algorithm.
 argon2-cffi==25.1.0  # https://argon2-cffi.readthedocs.io/en/stable
+
+# redis-py es el cliente oficial de Redis para Python, con soporte asíncrono.
+redis==5.0.1  # https://pypi.org/project/redis/
