@@ -6,6 +6,7 @@ from .user_update_controller import route as user_update_endpoint
 from .user_list_controller import route as user_list_endpoint
 from .change_password_endpoint import route as change_password_endpoint
 from .wallet_endpoints import route as wallet_endpoint
+from .games_endpoints import route as games_endpoint
 
 router = APIRouter()
 
@@ -17,6 +18,9 @@ router.include_router(change_password_endpoint, prefix="/me")
 
 # /users/wallet endpoints
 router.include_router(wallet_endpoint, prefix="/wallet")
+
+# /users/games endpoints (mini games)
+router.include_router(games_endpoint, prefix="/games")
 
 # /users (admin only)
 router.include_router(user_list_endpoint)

@@ -4,6 +4,7 @@ from .user_update_schema import UserUpdateSchema
 from .change_password_schema import ChangePasswordSchema
 from .wallet_transactions_schema import WalletTransactionSchema, WalletTransactionsListSchema
 from .purchase_tokens_schema import PurchaseTokensSchema, PurchaseTokensResponseSchema
+from .game_schemas import RoulettePlaySchema, CardFlipPlaySchema, GameResultSchema
 
 __all__ = [
     "UserDeleteSchema",
@@ -14,4 +15,7 @@ __all__ = [
     "WalletTransactionsListSchema",
     "PurchaseTokensSchema",
     "PurchaseTokensResponseSchema",
+    "RoulettePlaySchema",
+    "CardFlipPlaySchema",
+    "GameResultSchema",
 ]
