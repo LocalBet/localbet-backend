@@ -6,6 +6,8 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from logging import Logger, basicConfig, getLogger
 
+from backend.services.redis import redis_client
+
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +28,7 @@ from backend.shared.infrastructure.middlewares import (
 from backend.users.endpoints import router as users_router
 from backend.bets.endpoints import router as bets_router
 from backend.groups.endpoints import router as groups_router
+from backend.stats.endpoints import router as stats_router
 
 # Logging configuration
 LOGGER: Logger = getLogger(__name__)
@@ -35,7 +38,7 @@ basicConfig(
 )
 
 
-# Fast API
+# Fast API + Redis
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     """
@@ -47,9 +50,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     # ✅ Inicialitza la base de dades (crea taules si no existeixen)
     # init_db()
 
+    # Verifica conexión con Redis
+    await redis_client.ping()
+
     yield
 
     pool.close()
+    await redis_client.close()
 
 
 app = FastAPI(
@@ -65,6 +72,7 @@ app.include_router(router=auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(router=users_router, prefix="/users", tags=["Users"])
 app.include_router(router=bets_router, prefix="/bets", tags=["Bets"])
 app.include_router(router=groups_router, prefix="/groups", tags=["Groups"])
+app.include_router(router=stats_router, prefix="/stats", tags=["Statistics"])
 
 # Middlewares
 app.add_middleware(MaxUriLengthMiddleware)

@@ -14,6 +14,9 @@ from backend.shared.infrastructure.errors import HTTPError
 from backend.users.actions import PostgreSQLUserActions
 from backend.users.errors import UserAlreadyExistsError
 
+from backend.services.redis import redis_client
+import time
+
 route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLoggedMiddleware]))
 
 
@@ -105,5 +108,8 @@ async def user_registration(registration_data: CreateUserSchema) -> AccessTokenS
             title=exception.__class__.__name__,
             message=exception.message,
         ) from exception
+
+    now = int(time.time())
+    await redis_client.zadd("new_users", {registration_data.username: now})
 
     return AccessTokenSchema(access_token=access_token, refresh_token=refresh_token)
