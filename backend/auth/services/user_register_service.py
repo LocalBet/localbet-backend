@@ -78,7 +78,10 @@ class UserRegisterService:
             username=username,
             email=email,
             password=password,
-            coins=500,  # All new users start with 500 coins
+            coins=1000,
+            wins=0,
+            losses=0,
+            active_groups_count=0,
             full_name=full_name,
             phone_number=phone_number,  # None if not provided (NULL in DB)
             birth_date=birth_date,
@@ -90,6 +93,16 @@ class UserRegisterService:
         )
 
         self.__actions.save(user=user)
+
+        # TODO: Create initial wallet transaction
+        # from backend.users.models import WalletTransaction
+        # initial_transaction = WalletTransaction(
+        #     user_id=user.id,
+        #     amount=1000,
+        #     transaction_type='initial_balance',
+        #     description='Saldo inicial al registrarse'
+        # )
+        # self.__wallet_actions.save_transaction(transaction=initial_transaction)
 
         # Generate tokens for auto-login
         access_token = AccessToken().encode(user=user)

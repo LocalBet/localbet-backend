@@ -25,8 +25,26 @@ class UserGetSchema(BaseModel):
 
     coins: int = Field(
         default=...,
-        description="User coins.",
-        examples=[500]
+        description="User coins (G Tokens).",
+        examples=[1000]
+    )
+
+    wins: int = Field(
+        default=...,
+        description="Total bets won.",
+        examples=[5]
+    )
+
+    losses: int = Field(
+        default=...,
+        description="Total bets lost.",
+        examples=[2]
+    )
+
+    active_groups_count: int = Field(
+        default=...,
+        description="Number of active groups user is member of.",
+        examples=[3]
     )
 
     full_name: str | None = Field(
