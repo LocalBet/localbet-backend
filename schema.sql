@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     -- Legal/compliance fields
     accepted_terms BOOLEAN NOT NULL DEFAULT FALSE,
     accepted_privacy_policy BOOLEAN NOT NULL DEFAULT FALSE,
-    is_adult BOOLEAN NOT NULL,
+    legal_verified BOOLEAN NOT NULL,
     verified_at TIMESTAMP,  -- NULL = identity verification pending
 
     -- Timestamps
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 
     -- Constraints
     CONSTRAINT user_coins_non_negative CHECK (coins >= 0),
-    CONSTRAINT user_must_be_adult CHECK (is_adult = TRUE),
+    CONSTRAINT user_must_be_adult CHECK (legal_verified = TRUE),
     CONSTRAINT user_must_accept_terms CHECK (accepted_terms = TRUE),
     CONSTRAINT user_must_accept_privacy CHECK (accepted_privacy_policy = TRUE)
 );

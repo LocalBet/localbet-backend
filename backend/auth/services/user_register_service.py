@@ -70,7 +70,7 @@ class UserRegisterService:
 
         # Age is already validated by CreateUserSchema
         # If we reach here, user is 18+
-        is_adult = True
+        is_adult_verified = True
 
         # Identity verification pending (verified_at = None)
         # User can complete verification later for full access
@@ -88,7 +88,7 @@ class UserRegisterService:
             country=country,  # None if not provided (NULL in DB)
             accepted_terms=accepted_terms,
             accepted_privacy_policy=accepted_privacy_policy,
-            is_adult=is_adult,
+            legal_verified=is_adult_verified,
             verified_at=None,  # Identity verification pending
         )
 

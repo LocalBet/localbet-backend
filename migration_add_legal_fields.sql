@@ -12,7 +12,7 @@ ALTER TABLE "user" ADD COLUMN IF NOT EXISTS country TEXT;
 -- Add legal/compliance fields
 ALTER TABLE "user" ADD COLUMN IF NOT EXISTS accepted_terms BOOLEAN DEFAULT FALSE;
 ALTER TABLE "user" ADD COLUMN IF NOT EXISTS accepted_privacy_policy BOOLEAN DEFAULT FALSE;
-ALTER TABLE "user" ADD COLUMN IF NOT EXISTS is_adult BOOLEAN;
+ALTER TABLE "user" ADD COLUMN IF NOT EXISTS legal_verified BOOLEAN;
 ALTER TABLE "user" ADD COLUMN IF NOT EXISTS verified_at TIMESTAMP;
 
 -- Add timestamp fields
@@ -43,7 +43,7 @@ BEGIN
         AND conrelid = '"user"'::regclass
     ) THEN
         ALTER TABLE "user" ADD CONSTRAINT user_must_be_adult 
-        CHECK (is_adult = TRUE);
+        CHECK (legal_verified = TRUE);
     END IF;
 
     -- Check constraint: user must accept terms (no NULL allowed - required field)

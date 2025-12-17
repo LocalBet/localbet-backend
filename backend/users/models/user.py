@@ -40,7 +40,7 @@ class User(DataModel):
     # Legal/compliance fields
     __accepted_terms: bool
     __accepted_privacy_policy: bool
-    __is_adult: bool
+    __legal_verified: bool
     __verified_at: datetime | None
     
     # Timestamps
@@ -66,7 +66,7 @@ class User(DataModel):
         active_groups_count: int = 0,
         accepted_terms: bool,
         accepted_privacy_policy: bool,
-        is_adult: bool,
+        legal_verified: bool,
         verified_at: datetime | None = None,
         created_at: datetime | None = None,
         updated_at: datetime | None = None,
@@ -88,7 +88,7 @@ class User(DataModel):
             active_groups_count (int): Number of active groups (default: 0).
             accepted_terms (bool): Terms and conditions acceptance.
             accepted_privacy_policy (bool): Privacy policy acceptance.
-            is_adult (bool): Whether user is 18+ years old.
+            legal_verified (bool): Whether user is 18+ years old.
             verified_at (datetime | None): Verification timestamp (None = pending).
             created_at (datetime | None): Creation timestamp.
             updated_at (datetime | None): Last update timestamp.
@@ -111,7 +111,7 @@ class User(DataModel):
 
         self.__accepted_terms = accepted_terms
         self.__accepted_privacy_policy = accepted_privacy_policy
-        self.__is_adult = is_adult
+        self.__legal_verified = legal_verified
         self.__verified_at = verified_at
 
         now = datetime.now()
@@ -270,8 +270,8 @@ class User(DataModel):
         return self.__accepted_privacy_policy
 
     @property
-    def is_adult(self) -> bool:
-        return self.__is_adult
+    def legal_verified(self) -> bool:
+        return self.__legal_verified
 
     @property
     def verified_at(self) -> datetime | None:
