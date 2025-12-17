@@ -32,6 +32,11 @@ class User(DataModel):
     __birth_date: date
     __country: str | None
     
+    # Statistics (for ProfileScreen, StatisticsScreen)
+    __wins: int
+    __losses: int
+    __active_groups_count: int
+    
     # Legal/compliance fields
     __accepted_terms: bool
     __accepted_privacy_policy: bool
@@ -51,11 +56,14 @@ class User(DataModel):
         username: str,
         email: str,
         password: str,
-        coins: int = 500,
+        coins: int = 1000,
         full_name: str | None = None,
         phone_number: str | None = None,
         birth_date: date,
         country: str | None = None,
+        wins: int = 0,
+        losses: int = 0,
+        active_groups_count: int = 0,
         accepted_terms: bool,
         accepted_privacy_policy: bool,
         is_adult: bool,
@@ -70,11 +78,14 @@ class User(DataModel):
             username (str): User username.
             email (str): User email.
             password (str): User password.
-            coins (int): User available coins (default: 500).
+            coins (int): User available coins (default: 1000).
             full_name (str | None): User full name (optional).
             phone_number (str | None): User phone number (optional, None = not provided).
-            birth_date (date | None): User birth date.
+            birth_date (date): User birth date.
             country (str | None): User country (optional, None = not provided).
+            wins (int): Total bets won (default: 0).
+            losses (int): Total bets lost (default: 0).
+            active_groups_count (int): Number of active groups (default: 0).
             accepted_terms (bool): Terms and conditions acceptance.
             accepted_privacy_policy (bool): Privacy policy acceptance.
             is_adult (bool): Whether user is 18+ years old.
@@ -93,6 +104,10 @@ class User(DataModel):
         self.__phone_number = phone_number
         self.__birth_date = birth_date
         self.__country = country
+
+        self.__wins = wins
+        self.__losses = losses
+        self.__active_groups_count = active_groups_count
 
         self.__accepted_terms = accepted_terms
         self.__accepted_privacy_policy = accepted_privacy_policy
@@ -203,6 +218,47 @@ class User(DataModel):
     @country.setter
     def country(self, value: str | None) -> None:
         self.__country = value
+
+    # Statistics properties
+    @property
+    def wins(self) -> int:
+        return self.__wins
+
+    @wins.setter
+    def wins(self, value: int) -> None:
+        self.__wins = value
+
+    def increment_wins(self) -> None:
+        """Increment wins counter by 1."""
+        self.__wins += 1
+
+    @property
+    def losses(self) -> int:
+        return self.__losses
+
+    @losses.setter
+    def losses(self, value: int) -> None:
+        self.__losses = value
+
+    def increment_losses(self) -> None:
+        """Increment losses counter by 1."""
+        self.__losses += 1
+
+    @property
+    def active_groups_count(self) -> int:
+        return self.__active_groups_count
+
+    @active_groups_count.setter
+    def active_groups_count(self, value: int) -> None:
+        self.__active_groups_count = value
+
+    def increment_active_groups(self) -> None:
+        """Increment active groups counter by 1."""
+        self.__active_groups_count += 1
+
+    def decrement_active_groups(self) -> None:
+        """Decrement active groups counter by 1 (minimum 0)."""
+        self.__active_groups_count = max(0, self.__active_groups_count - 1)
 
     # Legal/compliance fields properties (read-only after creation)
     @property
