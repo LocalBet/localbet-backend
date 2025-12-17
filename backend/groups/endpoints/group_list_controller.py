@@ -13,7 +13,7 @@ route = APIRouter()
 @route.get(
     path="/",
     summary="Get a list of all groups.",
-    description="Retrieve a list of all groups in the system.",
+    description="Retrieve a list of all groups in the system with member and bet counts.",
     response_model=list[GroupGetSchema],
     status_code=status.HTTP_200_OK,
 )
@@ -26,6 +26,13 @@ async def list_groups(request: Request) -> list[GroupGetSchema]:
         for group in groups:
             data = group.to_dict()
             data.setdefault("bets", [])
+            
+            # MVP: Compute member_count and active_bets_count
+            data["member_count"] = len(group.members)
+            data["active_bets_count"] = len([b for b in group.bets if getattr(b, 'status', 'active') == 'active'])
+            data.setdefault("description", None)
+            data.setdefault("is_active", True)
+            
             result.append(GroupGetSchema(**data))
 
         return result
