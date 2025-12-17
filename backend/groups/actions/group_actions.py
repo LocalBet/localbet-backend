@@ -38,6 +38,6 @@ class GroupActions(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_user_groups(self, username: str) -> list[Group]:
-        """Retorna els grups on un username és membre."""
+    def get_user_groups(self, user_id: str | UUID) -> list[Group]:
+        """Retorna els grups on un user_id és membre."""
         raise NotImplementedError

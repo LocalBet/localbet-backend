@@ -2,12 +2,18 @@
 Service for creating and managing groups.
 """
 
-from backend.groups.actions import GroupActions  # Aquesta classe hauria de gestionar les accions sobre la base de dades
-from backend.groups.models import Group  # El model que acabes de crear per al grup
+from backend.groups.actions import GroupActions
+from backend.groups.models import Group
 
 class GroupService:
-    def __init__(self, action: GroupActions) -> None:
-        self.__action = action
+    def __init__(self, actions: GroupActions) -> None:
+        """
+        Initialize GroupService with actions repository.
+        
+        Args:
+            actions (GroupActions): Repository for group database operations.
+        """
+        self.__actions = actions
 
     def create(self, group: Group) -> None:
         """
@@ -16,7 +22,7 @@ class GroupService:
         Args:
             group (Group): The group to create.
         """
-        self.__action.save(group)
+        self.__actions.save(group)
 
     def update(self, group: Group) -> None:
         """
@@ -25,7 +31,7 @@ class GroupService:
         Args:
             group (Group): The group to update.
         """
-        self.__action.update(group)
+        self.__actions.update(group)
 
     def delete(self, group: Group) -> None:
         """
@@ -34,4 +40,34 @@ class GroupService:
         Args:
             group (Group): The group to delete.
         """
-        self.__action.delete(group)
+        self.__actions.delete(group)
+
+    def get_by_id(self, group_id: str) -> Group:
+        """
+        Get group by ID.
+        
+        Args:
+            group_id (str): Group UUID.
+            
+        Returns:
+            Group: The group with the given ID.
+            
+        Raises:
+            NoRowAffectedError: If group not found.
+        """
+        group = self.__actions.get_by_id(group_id)
+        
+        if not group:
+            from backend.shared.infrastructure.errors import NoRowAffectedError
+            raise NoRowAffectedError()
+        
+        return group
+
+    def get_all(self) -> list[Group]:
+        """
+        Get all groups.
+        
+        Returns:
+            list[Group]: List of all groups.
+        """
+        return self.__actions.get_all()

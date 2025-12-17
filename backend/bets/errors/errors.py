@@ -53,7 +53,7 @@ class BetStatusError(HTTPError):
         super().__init__(
             status_code=400,
             title="Invalid Bet Status",
-            message=f"Bet status '{status}' is not allowed. Must be one of: pending, won, lost.",
+            message=f"Bet status '{status}' is not allowed. Must be one of: active, closed, resolved.",
         )
 
 

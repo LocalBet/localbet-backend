@@ -9,93 +9,128 @@ from typing_extensions import override
 from backend.shared.models import DataModel
 
 from .bet_id import BetId
-from .bet_user_id import BetUserId
-from .bet_coin_id import BetCoinId
-from .bet_amount import BetAmount
-from .bet_cost import BetCost
+from .bet_title import BetTitle
+from .bet_description import BetDescription
+from .bet_group_id import BetGroupId
+from .bet_created_by import BetCreatedBy
+from .bet_min_bet import BetMinBet
 from .bet_status import BetStatus
-from .bet_name import BetName
-from .bet_create_date import BetCreatedDate
-from .bet_update_date import BetUpdatedDate
+from .bet_image_url import BetImageUrl
+from .bet_deadline import BetDeadline
+from .bet_created_at import BetCreatedAt
+from .bet_updated_at import BetUpdatedAt
 
 
 class Bet(DataModel):
     """
-    Bet model.
-
-    Notes:
-    - user_id = creator username (TEXT)
-    - cost = coins needed to join (entry fee)
-    - participants = list of usernames in this bet
+    Bet model aligned with SQL schema v2.0.
+    
+    Schema reference (04_tables.sql):
+    - id: UUID (PK)
+    - group_id: UUID (FK to group) - MANDATORY
+    - title: VARCHAR(255)
+    - description: TEXT
+    - image_url: VARCHAR(500) (optional)
+    - min_bet: INTEGER (default 100)
+    - deadline: TIMESTAMP
+    - status: VARCHAR(20) (active, closed, resolved)
+    - winning_option: UUID (FK to bet_options, nullable)
+    - created_by: UUID (FK to user)
+    - created_at: TIMESTAMP
+    - updated_at: TIMESTAMP
+    
+    Relations:
+    - participants: via user_bets table
+    - options: via bet_options table
     """
 
     __id: BetId
-    __user_id: BetUserId
-    __coin_id: BetCoinId
-    __amount: BetAmount
-    __cost: BetCost
+    __group_id: BetGroupId
+    __title: BetTitle
+    __description: BetDescription
+    __image_url: BetImageUrl
+    __min_bet: BetMinBet
+    __deadline: BetDeadline
     __status: BetStatus
-    __name: BetName
-    __create_date: BetCreatedDate
-    __update_date: BetUpdatedDate
-
-    # 👇 nou
-    __participants: list[str]
+    __created_by: BetCreatedBy
+    __created_at: BetCreatedAt
+    __updated_at: BetUpdatedAt
 
     __hash__ = DataModel.__hash__
 
     def __init__(
         self,
         id: str | UUID,
-        user_id: str,              # ✅ ara username (TEXT)
-        coin_id: str | UUID,
-        amount: float,
-        cost: float,               # ✅ nou
+        group_id: str | UUID,
+        title: str,
+        description: str,
+        min_bet: int,
+        deadline: datetime,
+        created_by: str | UUID,
         status: str,
-        name: str,
-        create_date: datetime,
-        update_date: datetime,
-        participants: list[str] | None = None,   # ✅ nou
+        created_at: datetime,
+        updated_at: datetime,
+        image_url: str | None = None,
     ) -> None:
         self.__id = BetId(value=id)
-        self.__user_id = BetUserId(value=user_id)
-        self.__coin_id = BetCoinId(value=coin_id)
-        self.__amount = BetAmount(value=amount)
-        self.__cost = BetCost(value=cost)
+        self.__group_id = BetGroupId(value=group_id)
+        self.__title = BetTitle(value=title)
+        self.__description = BetDescription(value=description)
+        self.__image_url = BetImageUrl(value=image_url)
+        self.__min_bet = BetMinBet(value=min_bet)
+        self.__deadline = BetDeadline(value=deadline)
         self.__status = BetStatus(value=status)
-        self.__name = BetName(value=name)
-        self.__create_date = BetCreatedDate(value=create_date)
-        self.__update_date = BetUpdatedDate(value=update_date)
-        self.__participants = participants or []
+        self.__created_by = BetCreatedBy(value=created_by)
+        self.__created_at = BetCreatedAt(value=created_at)
+        self.__updated_at = BetUpdatedAt(value=updated_at)
 
     @property
     def id(self) -> str | UUID:
         return self.__id.value
 
     @property
-    def user_id(self) -> str:
-        # creator username
-        return str(self.__user_id.value)
+    def group_id(self) -> UUID:
+        return self.__group_id.value
 
     @property
-    def coin_id(self) -> str | UUID:
-        return self.__coin_id.value
+    def title(self) -> str:
+        return self.__title.value
+
+    @title.setter
+    def title(self, value: str) -> None:
+        self.__title = BetTitle(value=value)
 
     @property
-    def amount(self) -> float:
-        return self.__amount.value
+    def description(self) -> str:
+        return self.__description.value
 
-    @amount.setter
-    def amount(self, value: float) -> None:
-        self.__amount = BetAmount(value=value)
+    @description.setter
+    def description(self, value: str) -> None:
+        self.__description = BetDescription(value=value)
 
     @property
-    def cost(self) -> float:
-        return self.__cost.value
+    def image_url(self) -> str | None:
+        return self.__image_url.value
 
-    @cost.setter
-    def cost(self, value: float) -> None:
-        self.__cost = BetCost(value=value)
+    @image_url.setter
+    def image_url(self, value: str | None) -> None:
+        self.__image_url = BetImageUrl(value=value)
+
+    @property
+    def min_bet(self) -> int:
+        return self.__min_bet.value
+
+    @min_bet.setter
+    def min_bet(self, value: int) -> None:
+        self.__min_bet = BetMinBet(value=value)
+
+    @property
+    def deadline(self) -> datetime:
+        return self.__deadline.value
+
+    @deadline.setter
+    def deadline(self, value: datetime) -> None:
+        self.__deadline = BetDeadline(value=value)
 
     @property
     def status(self) -> str:
@@ -106,33 +141,34 @@ class Bet(DataModel):
         self.__status = BetStatus(value=value)
 
     @property
-    def name(self) -> str:
-        return self.__name.value
-
-    @name.setter
-    def name(self, value: str) -> None:
-        self.__name = BetName(value=value)
+    def created_by(self) -> UUID:
+        """Creator user UUID."""
+        return self.__created_by.value
 
     @property
-    def participants(self) -> list[str]:
-        return self.__participants
-
-    def add_participant(self, username: str) -> None:
-        if username not in self.__participants:
-            self.__participants.append(username)
-
-    def remove_participant(self, username: str) -> None:
-        if username in self.__participants:
-            self.__participants.remove(username)
+    def created_at(self) -> datetime:
+        return self.__created_at.value
 
     @property
-    def create_date(self) -> datetime:
-        return self.__create_date.value
+    def updated_at(self) -> datetime:
+        return self.__updated_at.value
 
-    @property
-    def update_date(self) -> datetime:
-        return self.__update_date.value
+    @updated_at.setter
+    def updated_at(self, value: datetime) -> None:
+        self.__updated_at = BetUpdatedAt(value=value)
 
-    @update_date.setter
-    def update_date(self, value: datetime) -> None:
-        self.__update_date = BetUpdatedDate(value=value)
+    def to_dict(self) -> dict:
+        """Dict for API response."""
+        return {
+            "id": str(self.id),
+            "group_id": str(self.group_id),
+            "title": self.title,
+            "description": self.description,
+            "image_url": self.image_url,
+            "min_bet": self.min_bet,
+            "deadline": self.deadline,
+            "status": self.status,
+            "created_by": str(self.created_by),
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }

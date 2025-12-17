@@ -12,34 +12,44 @@ from backend.shared.models import DataModel
 
 from .group_id import GroupId
 from .group_name import GroupName
-from .group_create_date import GroupCreateDate
-from .group_update_date import GroupUpdateDate
+from .group_created_at import GroupCreatedAt
+from .group_updated_at import GroupUpdatedAt
+from .group_creator_id import GroupCreatorId
+from .group_description import GroupDescription
+from .group_is_active import GroupIsActive
 
 if TYPE_CHECKING:
-    # Ajusta l'import segons la teva estructura real
     from backend.bets.models.bet import Bet
 
 
 class Group(DataModel):
     """
-    Group model.
-
-    - members: usernames (List[str])
-    - admin_username: username (str)
-    - bets:
-        * a BBDD: guardem UUID[] (ids de bet)
-        * a API: podem hidratar bets com List[Bet] i retornar-les serialitzades
+    Group model aligned with SQL schema v2.0.
+    
+    Schema reference (04_tables.sql):
+    - id: UUID (PK)
+    - name: VARCHAR(100)
+    - description: TEXT (optional)
+    - creator_id: UUID (FK to user)
+    - is_active: BOOLEAN
+    - created_at: TIMESTAMP
+    - updated_at: TIMESTAMP
+    
+    Relations:
+    - members: via group_member table (user_id UUID)
+    - bets: via bet.group_id FK (reverse relation)
     """
 
     __id: GroupId
     __name: GroupName
-    __create_date: GroupCreateDate
-    __update_date: GroupUpdateDate
+    __description: GroupDescription
+    __creator_id: GroupCreatorId
+    __is_active: GroupIsActive
+    __created_at: GroupCreatedAt
+    __updated_at: GroupUpdatedAt
 
-    __members: list[str]
-    __admin_username: str
-
-    __bet_ids: list[UUID]
+    # Hydrated relations (optional, loaded separately)
+    __members: list[UUID] | None
     __bets: list["Bet"] | None
 
     __hash__ = DataModel.__hash__
@@ -48,22 +58,24 @@ class Group(DataModel):
         self,
         id: str | UUID,
         name: str,
-        create_date: datetime,
-        update_date: datetime,
-        members: list[str],
-        admin_username: str,
-        bets: list[str | UUID] | None = None,          # ids (del camp groups.bets)
-        hydrated_bets: list["Bet"] | None = None,      # opcional: bets completes
+        creator_id: str | UUID,
+        created_at: datetime,
+        updated_at: datetime,
+        description: str | None = None,
+        is_active: bool = True,
+        # Optional hydrated relations
+        members: list[UUID] | None = None,
+        hydrated_bets: list["Bet"] | None = None,
     ) -> None:
         self.__id = GroupId(value=id)
         self.__name = GroupName(value=name)
-        self.__create_date = GroupCreateDate(value=create_date)
-        self.__update_date = GroupUpdateDate(value=update_date)
+        self.__description = GroupDescription(value=description)
+        self.__creator_id = GroupCreatorId(value=creator_id)
+        self.__is_active = GroupIsActive(value=is_active)
+        self.__created_at = GroupCreatedAt(value=created_at)
+        self.__updated_at = GroupUpdatedAt(value=updated_at)
 
         self.__members = members
-        self.__admin_username = admin_username
-
-        self.__bet_ids = [UUID(str(x)) for x in (bets or [])]
         self.__bets = hydrated_bets
 
     @property
@@ -75,71 +87,79 @@ class Group(DataModel):
         return self.__name.value
 
     @property
-    def create_date(self) -> datetime:
-        return self.__create_date.value
+    def description(self) -> str | None:
+        return self.__description.value
 
     @property
-    def update_date(self) -> datetime:
-        return self.__update_date.value
-
-    @update_date.setter
-    def update_date(self, value: datetime) -> None:
-        self.__update_date = GroupUpdateDate(value=value)
+    def creator_id(self) -> UUID:
+        return self.__creator_id.value
 
     @property
-    def members(self) -> list[str]:
-        return self.__members
+    def is_active(self) -> bool:
+        return self.__is_active.value
+
+    @is_active.setter
+    def is_active(self, value: bool) -> None:
+        self.__is_active = GroupIsActive(value=value)
 
     @property
-    def admin_username(self) -> str:
-        return self.__admin_username
-
-    # Alias (per si tens codi vell que fa servir admin_id)
-    @property
-    def admin_id(self) -> str:
-        return self.__admin_username
+    def created_at(self) -> datetime:
+        return self.__created_at.value
 
     @property
-    def bet_ids(self) -> list[UUID]:
-        return self.__bet_ids
+    def updated_at(self) -> datetime:
+        return self.__updated_at.value
+
+    @updated_at.setter
+    def updated_at(self, value: datetime) -> None:
+        self.__updated_at = GroupUpdatedAt(value=value)
+
+    @property
+    def members(self) -> list[UUID]:
+        """Returns list of member UUIDs (hydrated from group_member table)."""
+        return self.__members or []
+
+    def set_members(self, members: list[UUID]) -> None:
+        """Set members list (hydrated from DB)."""
+        self.__members = members
 
     @property
     def bets(self) -> list["Bet"]:
+        """Returns list of Bet objects (hydrated from bet table)."""
         return self.__bets or []
 
     def set_bets(self, bets: list["Bet"]) -> None:
-        """Hidrata bets completes i sincronitza bet_ids."""
+        """Set bets list (hydrated from DB)."""
         self.__bets = bets
-        self.__bet_ids = [UUID(str(b.id)) for b in bets]
 
     def to_persistence_dict(self) -> dict[str, Any]:
-        """Dict per guardar a Postgres."""
+        """Dict for saving to PostgreSQL."""
         return {
             "id": self.id,
             "name": self.name,
-            "create_date": self.create_date,
-            "update_date": self.update_date,
-            "members": self.members,                 # TEXT[]
-            "admin_username": self.admin_username,   # TEXT
-            "bets": self.bet_ids,                    # UUID[]
+            "description": self.description,
+            "creator_id": self.creator_id,
+            "is_active": self.is_active,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
         }
 
     def to_dict(self) -> dict[str, Any]:
         """
-        Dict per resposta API (schema GroupGetSchema).
-        Si no estan hidratades, retorna bets = [].
+        Dict for API response (schema GroupGetSchema).
         """
         bets_payload: list[Any] = []
         if self.__bets:
-            # Suposo que Bet hereta DataModel i té to_dict()
             bets_payload = [b.to_dict() for b in self.__bets]
 
         return {
             "id": self.id,
             "name": self.name,
-            "create_date": self.create_date,
-            "update_date": self.update_date,
-            "members": self.members,
-            "admin_username": self.admin_username,
+            "description": self.description,
+            "creator_id": self.creator_id,
+            "is_active": self.is_active,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "members": [str(m) for m in self.members],  # Convert UUIDs to strings
             "bets": bets_payload,
         }

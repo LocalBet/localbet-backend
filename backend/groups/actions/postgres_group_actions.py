@@ -18,25 +18,33 @@ class PostgreSQLGroupActions(GroupActions):
 
     # -------- Helpers --------
     def __base_select(self) -> str:
-        # Carrega grup + members + bet_ids en una sola query
+        """
+        Load group + members (UUIDs) + bets via JOINs.
+        
+        CRITICAL: No group_bet table exists in SQL v2.0.
+        - Members: JOIN group_member (user_id UUID)
+        - Bets: JOIN bet WHERE bet.group_id = group.id
+        """
         return """
             SELECT
                 g.id,
                 g.name,
-                g.create_date,
-                g.update_date,
-                g.admin_username,
+                g.description,
+                g.creator_id,
+                g.is_active,
+                g.created_at,
+                g.updated_at,
                 COALESCE(
-                    array_agg(DISTINCT gm.username) FILTER (WHERE gm.username IS NOT NULL),
+                    array_agg(DISTINCT gm.user_id) FILTER (WHERE gm.user_id IS NOT NULL),
                     '{}'
                 ) AS members,
                 COALESCE(
-                    array_agg(DISTINCT gb.bet_id) FILTER (WHERE gb.bet_id IS NOT NULL),
+                    array_agg(DISTINCT b.id) FILTER (WHERE b.id IS NOT NULL),
                     '{}'
-                ) AS bets
+                ) AS hydrated_bets
             FROM "group" g
             LEFT JOIN group_member gm ON gm.group_id = g.id
-            LEFT JOIN group_bet gb ON gb.group_id = g.id
+            LEFT JOIN bet b ON b.group_id = g.id
             WHERE 1=1
         """
 
@@ -46,8 +54,7 @@ class PostgreSQLGroupActions(GroupActions):
         query = self.__base_select()
         parameters: dict[str, Any] = {}
 
-        # IMPORTANT: assumeixo que condition.field ve amb noms segurs com:
-        # "id", "name", "admin_username"
+        # condition.field should be safe like: "id", "name", "creator_id"
         for index, condition in enumerate(conditions):
             query += f' AND g.{condition.field} {condition.operator} %(param_{index})s'
             parameters[f"param_{index}"] = condition.value
@@ -68,147 +75,149 @@ class PostgreSQLGroupActions(GroupActions):
     def get_all(self) -> list[Group]:
         query = self.__base_select() + """
             GROUP BY g.id
-            ORDER BY g.create_date DESC
+            ORDER BY g.created_at DESC
         """
         return self.__connection.search_all(query, {}, Group)
 
     @override
-    def get_user_groups(self, username: str) -> list[Group]:
-        # Filtra per membres: l’usuari ha d’estar a group_member
+    def get_user_groups(self, user_id: str | UUID) -> list[Group]:
+        """
+        Get all groups where user is a member.
+        
+        CRITICAL: Use user_id (UUID) instead of username.
+        """
         query = """
             SELECT
                 g.id,
                 g.name,
-                g.create_date,
-                g.update_date,
-                g.admin_username,
+                g.description,
+                g.creator_id,
+                g.is_active,
+                g.created_at,
+                g.updated_at,
                 COALESCE(
-                    array_agg(DISTINCT gm2.username) FILTER (WHERE gm2.username IS NOT NULL),
+                    array_agg(DISTINCT gm2.user_id) FILTER (WHERE gm2.user_id IS NOT NULL),
                     '{}'
                 ) AS members,
                 COALESCE(
-                    array_agg(DISTINCT gb.bet_id) FILTER (WHERE gb.bet_id IS NOT NULL),
+                    array_agg(DISTINCT b.id) FILTER (WHERE b.id IS NOT NULL),
                     '{}'
                 ) AS bets
             FROM "group" g
-            JOIN group_member gm ON gm.group_id = g.id AND gm.username = %(username)s
+            JOIN group_member gm ON gm.group_id = g.id AND gm.user_id = %(user_id)s
             LEFT JOIN group_member gm2 ON gm2.group_id = g.id
-            LEFT JOIN group_bet gb ON gb.group_id = g.id
+            LEFT JOIN bet b ON b.group_id = g.id
             GROUP BY g.id
-            ORDER BY g.create_date DESC
+            ORDER BY g.created_at DESC
         """
-        return self.__connection.search_all(query, {"username": username}, Group)
+        return self.__connection.search_all(query, {"user_id": str(user_id)}, Group)
 
     @override
     def save(self, group: Group) -> None:
-        # 1) grup
+        """
+        Save group to DB.
+        
+        CRITICAL: Use creator_id (UUID) instead of admin_username.
+        Members are NOT stored in group table (use add_member separately).
+        """
         query_group: Composed = SQL("""
-            INSERT INTO "group" (id, name, admin_username, create_date, update_date)
-            VALUES (%(id)s, %(name)s, %(admin_username)s, %(create_date)s, %(update_date)s)
+            INSERT INTO "group" (id, name, description, creator_id, is_active, created_at, updated_at)
+            VALUES (%(id)s, %(name)s, %(description)s, %(creator_id)s, %(is_active)s, %(created_at)s, %(updated_at)s)
         """)
         self.__connection.execute(
             query=query_group,
             parameters={
                 "id": group.id,
                 "name": group.name,
-                "admin_username": group.admin_username,
-                "create_date": group.create_date,
-                "update_date": group.update_date,
+                "description": group.description,
+                "creator_id": str(group.creator_id),
+                "is_active": group.is_active,
+                "created_at": group.created_at,
+                "updated_at": group.updated_at,
             },
         )
 
-        # 2) members
-        query_member: Composed = SQL("""
-            INSERT INTO group_member (group_id, username)
-            VALUES (%(group_id)s, %(username)s)
-            ON CONFLICT DO NOTHING
-        """)
-        for username in group.members:
-            self.__connection.execute(
-                query=query_member,
-                parameters={"group_id": group.id, "username": username},
-            )
-
-        # 3) bets (ids)
-        query_bet: Composed = SQL("""
-            INSERT INTO group_bet (group_id, bet_id)
-            VALUES (%(group_id)s, %(bet_id)s)
-            ON CONFLICT DO NOTHING
-        """)
-        for bet_id in group.bet_ids:
-            self.__connection.execute(
-                query=query_bet,
-                parameters={"group_id": group.id, "bet_id": bet_id},
-            )
+        # Add members if provided
+        if group.members:
+            query_member: Composed = SQL("""
+                INSERT INTO group_member (group_id, user_id)
+                VALUES (%(group_id)s, %(user_id)s)
+                ON CONFLICT DO NOTHING
+            """)
+            for user_id in group.members:
+                self.__connection.execute(
+                    query=query_member,
+                    parameters={"group_id": str(group.id), "user_id": str(user_id)},
+                )
 
     @override
     def update(self, group: Group) -> None:
-        # 1) update base group fields
+        """
+        Update group fields.
+        
+        CRITICAL: Use creator_id instead of admin_username.
+        Members are managed separately via add_member/remove_member.
+        """
         query_update: Composed = SQL("""
             UPDATE "group"
             SET name = %(name)s,
-                admin_username = %(admin_username)s,
-                update_date = %(update_date)s
+                description = %(description)s,
+                creator_id = %(creator_id)s,
+                is_active = %(is_active)s,
+                updated_at = %(updated_at)s
             WHERE id = %(id)s
         """)
         self.__connection.execute(
             query=query_update,
             parameters={
-                "id": group.id,
+                "id": str(group.id),
                 "name": group.name,
-                "admin_username": group.admin_username,
-                "update_date": group.update_date,
+                "description": group.description,
+                "creator_id": str(group.creator_id),
+                "is_active": group.is_active,
+                "updated_at": group.updated_at,
             },
         )
 
-        # 2) replace members
-        self.__connection.execute(
-            query=SQL('DELETE FROM group_member WHERE group_id = %(group_id)s'),
-            parameters={"group_id": group.id},
-        )
-
-        query_member: Composed = SQL("""
-            INSERT INTO group_member (group_id, username)
-            VALUES (%(group_id)s, %(username)s)
-            ON CONFLICT DO NOTHING
-        """)
-        for username in group.members:
+        # Replace members if provided
+        if group.members is not None:
             self.__connection.execute(
-                query=query_member,
-                parameters={"group_id": group.id, "username": username},
+                query=SQL('DELETE FROM group_member WHERE group_id = %(group_id)s'),
+                parameters={"group_id": str(group.id)},
             )
 
-        # 3) replace bets
-        self.__connection.execute(
-            query=SQL('DELETE FROM group_bet WHERE group_id = %(group_id)s'),
-            parameters={"group_id": group.id},
-        )
-
-        query_bet: Composed = SQL("""
-            INSERT INTO group_bet (group_id, bet_id)
-            VALUES (%(group_id)s, %(bet_id)s)
-            ON CONFLICT DO NOTHING
-        """)
-        for bet_id in group.bet_ids:
-            self.__connection.execute(
-                query=query_bet,
-                parameters={"group_id": group.id, "bet_id": bet_id},
-            )
+            query_member: Composed = SQL("""
+                INSERT INTO group_member (group_id, user_id)
+                VALUES (%(group_id)s, %(user_id)s)
+                ON CONFLICT DO NOTHING
+            """)
+            for user_id in group.members:
+                self.__connection.execute(
+                    query=query_member,
+                    parameters={"group_id": str(group.id), "user_id": str(user_id)},
+                )
 
     @override
     def delete(self, group: Group) -> None:
-        # Cascades eliminen group_member i group_bet
+        """
+        Delete group (cascades to group_member and bets).
+        """
         query: Composed = SQL('DELETE FROM "group" WHERE id = %(id)s')
-        self.__connection.execute(query=query, parameters={"id": group.id})
+        self.__connection.execute(query=query, parameters={"id": str(group.id)})
 
     
-    def add_member(self, group_id: str | UUID, username: str) -> None:
+    def add_member(self, group_id: str | UUID, user_id: str | UUID) -> None:
+        """
+        Add member to group.
+        
+        CRITICAL: Use user_id (UUID) instead of username.
+        """
         query = SQL("""
-            INSERT INTO group_member (group_id, username)
-            VALUES (%(group_id)s, %(username)s)
+            INSERT INTO group_member (group_id, user_id)
+            VALUES (%(group_id)s, %(user_id)s)
             ON CONFLICT DO NOTHING
         """)
         self.__connection.execute(
             query=query,
-            parameters={"group_id": str(group_id), "username": username},
+            parameters={"group_id": str(group_id), "user_id": str(user_id)},
         )

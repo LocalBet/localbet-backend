@@ -4,6 +4,7 @@ Get a group by its ID.
 
 from fastapi import APIRouter, Request, status
 from backend.groups.services import GroupService
+from backend.groups.actions.postgres_group_actions import PostgreSQLGroupActions
 from backend.groups.schemas import GroupGetSchema
 from backend.database import get_database_connection
 
@@ -19,7 +20,9 @@ route = APIRouter()
 )
 async def get_group(request: Request, group_id: str) -> GroupGetSchema:
     with get_database_connection() as connection:
-        group_service = GroupService(connection)
+        # FIX: Create actions repository first, then pass to service
+        actions = PostgreSQLGroupActions(connection)
+        group_service = GroupService(actions)
         group = group_service.get_by_id(group_id)
 
         data = group.to_dict()
