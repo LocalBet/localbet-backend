@@ -24,17 +24,24 @@ route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustBeLoggedMid
 )
 async def create_bet(request: Request, bet_data: BetCreateSchema) -> BetGetSchema:
     logged_user = request.state.logged_user
+
     with get_database_connection() as connection:
-        bet_creator = BetCreatorService(PostgreSQLBetActions(connection))
+        bet_service = BetCreatorService(PostgreSQLBetActions(connection))
+        now = datetime.utcnow()
+
         bet = Bet(
             id=uuid4(),
-            user_id=logged_user.id,
-            coin_id=bet_data.coin_id,
-            amount=bet_data.amount,
-            status="pending", #SOME GLOBAL VARIABLE? OR SOME CONSTANT
-            name=bet_data.name,
-            create_date=datetime.utcnow(),
-            update_date=datetime.utcnow(),
+            group_id=bet_data.group_id,
+            title=bet_data.title,
+            description=bet_data.description,
+            image_url=bet_data.image_url,
+            min_bet=bet_data.min_bet,
+            deadline=bet_data.deadline,
+            status="active",
+            created_by=logged_user.id,
+            created_at=now,
+            updated_at=now,
         )
-        bet_creator.create(bet)
+
+        bet_service.create(bet)
         return BetGetSchema(**bet.to_dict())

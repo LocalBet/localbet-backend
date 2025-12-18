@@ -1,14 +1,17 @@
 from uuid import UUID
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from datetime import datetime
-from typing import List
 
 class BetGetSchema(BaseModel):
     id: UUID
-    user_id: str = Field(..., description="Creator username")
-    name: str
-    cost: float
+    group_id: UUID
+    title: str
+    description: str
+    image_url: str | None
+    min_bet: int
+    deadline: datetime
     status: str
-    create_date: datetime
-    update_date: datetime
-    participants: List[str] = Field(default_factory=list)
+    winning_option: UUID | None = None
+    created_by: UUID
+    created_at: datetime
+    updated_at: datetime

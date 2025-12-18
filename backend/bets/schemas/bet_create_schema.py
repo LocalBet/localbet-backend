@@ -1,5 +1,11 @@
-from pydantic import BaseModel, Field
+from uuid import UUID
+from pydantic import BaseModel
+from datetime import datetime
 
 class BetCreateSchema(BaseModel):
-    name: str = Field(..., min_length=3, description="Bet name")
-    cost: float = Field(..., ge=0, description="Coins required to join this bet")
+    group_id: UUID
+    title: str
+    description: str
+    image_url: str | None = None
+    min_bet: int = 100
+    deadline: datetime

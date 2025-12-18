@@ -17,7 +17,7 @@ from backend.users.services import UserFinderService
 from backend.services.redis import redis_client
 import time
 
-route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLoggedMiddleware]))
+route = APIRouter()
 
 
 @route.post(

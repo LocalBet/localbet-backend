@@ -30,15 +30,12 @@ async def create_group(request: Request, group_data: GroupCreateSchema) -> Group
         group = Group(
             id=uuid4(),
             name=group_data.name,
-            create_date=datetime.utcnow(),
-            update_date=datetime.utcnow(),
-            members=[logged_user.username],      # ✅ username
-            admin_username=logged_user.username, # ✅ username
-            bets=[],                              # ✅ nou camp
+            description=group_data.description,
+            creator_id=logged_user.id,
+            is_active=True,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
         )
 
         group_creator.create(group)
-
-        data = group.to_dict()
-        data.setdefault("bets", [])
-        return GroupGetSchema(**data)
+        return GroupGetSchema(**group.to_dict())
