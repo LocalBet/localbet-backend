@@ -44,8 +44,8 @@ class RefreshAccessTokenService:
             tuple[str, str]: The new access token and refresh token.
         """
         try:
-            user_id = RefreshToken().decode(token=refresh_token).subject
-            user = self.__find_user(user_id=user_id)
+            username = RefreshToken().decode(token=refresh_token).subject
+            user = self.__find_user(username=username)
             if not user:
                 raise InvalidRefreshTokenError()
 
@@ -54,27 +54,27 @@ class RefreshAccessTokenService:
         except Exception as exception:
             raise InvalidRefreshTokenError() from exception
 
-    def __find_user(self, user_id: str) -> User | None:
+    def __find_user(self, username: str) -> User | None:
         """
         Find user by id.
 
         Args:
-            user_id (str): User id.
+            username (str): username.
 
         Raises:
-            IdentifierError: If the user id is invalid.
+            IdentifierError: If the username is invalid.
             UserNotFoundError: If the user is not found.
 
         Returns:
             User: The user. None if the user is not found.
         """
         conditions: list[Condition[DataModel]] = [
-            Condition[DataModel](field="id", operator=SQLOperation.EQUAL, value=user_id)
+            Condition[DataModel](field="username", operator=SQLOperation.EQUAL, value=username)
         ]
 
         users: list[User] = self.__user_finder.find(conditions=conditions)
         if users and len(users) > 1:
-            raise UserNotFoundError(field="id", value=user_id)
+            raise UserNotFoundError(field="username", value=username)
         elif users:
             return users[0]
         else:

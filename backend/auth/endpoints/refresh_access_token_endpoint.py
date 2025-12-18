@@ -13,6 +13,7 @@ from backend.shared.infrastructure import MiddlewareWrapper
 from backend.shared.infrastructure.errors import HTTPError
 from backend.users.actions import PostgreSQLUserActions
 from backend.users.services import UserFinderService
+from backend.auth.models import RefreshToken
 
 from backend.services.redis import redis_client
 import time
@@ -65,7 +66,7 @@ async def user_login(refresh_data: RefreshTokenSchema) -> AccessTokenSchema:
                 refresh_token=refresh_data.refresh_token
             )
 
-            user = user_finder_service.find_by_refresh_token(old_refresh_token)
+            username = RefreshToken().decode(token=old_refresh_token).subject
 
     except InvalidRefreshTokenError as exception:
         raise HTTPError(
@@ -76,7 +77,6 @@ async def user_login(refresh_data: RefreshTokenSchema) -> AccessTokenSchema:
 
     token_ttl = 300
     expire_at = int(time.time()) + token_ttl
-    username = user.username
 
     await redis_client.zadd("active_users", {username: expire_at})
 
