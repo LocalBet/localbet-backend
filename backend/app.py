@@ -67,6 +67,19 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,     # puedes usar ["*"] para pruebas
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Routers
 app.include_router(router=auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(router=users_router, prefix="/users", tags=["Users"])

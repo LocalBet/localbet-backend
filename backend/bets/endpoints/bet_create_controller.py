@@ -12,6 +12,7 @@ from backend.bets.schemas import BetCreateSchema, BetGetSchema
 from backend.bets.services import BetCreatorService
 from backend.bets.actions.postgres_bet_actions import PostgreSQLBetActions
 from backend.database import get_database_connection
+from backend.services.redis import redis_client   # <-- import Redis client
 
 route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustBeLoggedMiddleware]))
 
@@ -44,4 +45,10 @@ async def create_bet(request: Request, bet_data: BetCreateSchema) -> BetGetSchem
         )
 
         bet_service.create(bet)
+
+        # Add bet to Redis ZSET for 24h tracking
+        # Use created_at timestamp as score, and bet.id or bet.title as member
+        timestamp = int(now.timestamp())
+        await redis_client.zadd("new_bets", {str(bet.id): timestamp})
+
         return BetGetSchema(**bet.to_dict())
