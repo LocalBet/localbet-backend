@@ -11,13 +11,7 @@ class UserCreatedSchema(BaseModel):
     """
 
     message: str = Field(
-        default=...,
+        default="User created successfully.",
         description="Message that indicates that the user was created successfully.",
-        examples=["A verification link has been sent to the provided email address."],
+        examples=["User created successfully."],
     )
-
-    def __init__(self) -> None:
-        """
-        UserCreatedSchema constructor.
-        """
-        super().__init__(message="A verification link has been sent to the provided email address.")

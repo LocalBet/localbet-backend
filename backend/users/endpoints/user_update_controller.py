@@ -71,10 +71,8 @@ async def user_update(request: Request, update_data: UserUpdateSchema) -> None:
             logged_user = request.state.logged_user
             updater_service.update(
                 user=logged_user,
-                name=update_data.name,
                 username=update_data.username,
                 email=update_data.email,
-                role_id=update_data.role_id,
                 old_password=update_data.old_password,
                 new_password=update_data.new_password,
                 new_password_confirmation=update_data.new_password_verification,
@@ -91,5 +89,5 @@ async def user_update(request: Request, update_data: UserUpdateSchema) -> None:
         raise HTTPError(
             status_code=status.HTTP_401_UNAUTHORIZED,
             title="Unauthorized",
-            message="Invalid email or password.",
+            message="Invalid password or user not found.",
         ) from exception

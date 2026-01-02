@@ -15,6 +15,9 @@ from backend.users.actions import PostgreSQLUserActions
 from backend.users.errors import UserNotFoundError
 from backend.users.services import UserFinderService
 
+from backend.services.redis import redis_client
+import time
+
 route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLoggedMiddleware]))
 
 
@@ -76,7 +79,10 @@ async def user_login(login_data: LoginSchema) -> AccessTokenSchema:
             user_searcher_service = UserFinderService(action=user_action)
             login_service = UserLoginService(actions=user_action, finder=user_searcher_service)
 
-            access_token, refresh_token = login_service.login(email=login_data.email, password=login_data.password)
+            access_token, refresh_token = login_service.login(
+                username=login_data.identifier,
+                password=login_data.password
+            )
 
     except (UserNotFoundError, PasswordVerificationError) as exception:
         raise HTTPError(
@@ -84,5 +90,12 @@ async def user_login(login_data: LoginSchema) -> AccessTokenSchema:
             title="Unauthorized",
             message="Invalid email or password.",
         ) from exception
+
+    token_ttl = 300  # segundos
+    expire_at = int(time.time()) + token_ttl
+
+    # Guardar usuario en ZSET con fecha de expiración
+    await redis_client.zadd("active_users", {login_data.identifier: expire_at})
+
 
     return AccessTokenSchema(access_token=access_token, refresh_token=refresh_token)

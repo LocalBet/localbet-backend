@@ -16,23 +16,14 @@ class UserFinderService:
     __action: UserActions
 
     def __init__(self, action: UserActions) -> None:
-        """
-        FindUser constructor.
-        """
         self.__action = action
 
     def find(self, conditions: list[Condition[DataModel]]) -> list[User]:
         """
         Find a user.
 
-        Args:
-            conditions (list[Condition]): Conditions to find the user.
-
         Raises:
             UserNotFoundError: If user is not found.
-
-        Returns:
-            list[User]: Found user.
         """
         users = self.__action.search(conditions=conditions)
 

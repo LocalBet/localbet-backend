@@ -25,27 +25,10 @@ class UserMustBeLoggedMiddleware(BaseHTTPMiddleware):
     __finder: UserFinderService
 
     def __init__(self, app: ASGIApp) -> None:
-        """
-        UserMustBeLoggedMiddleware constructor.
-
-        Args:
-            app (ASGIApp): The ASGI app to call.
-        """
         super().__init__(app=app)
 
     @override
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        """
-        Middleware that checks if the user is not logged in.
-
-        Args:
-            request (Request): The request that the user is making.
-            call_next (RequestResponseEndpoint): The endpoint to call.
-
-        Raises:
-            InvalidAccessTokenError: If the access token is invalid.
-            UserMustBeLoggedError: If the user is not logged in.
-        """
         with get_database_connection() as database_connection:
             action = PostgreSQLUserActions(connection=database_connection)
             self.__finder = UserFinderService(action=action)
@@ -62,31 +45,22 @@ class UserMustBeLoggedMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
     def __retrieve_user(self, access_token: str | None) -> User | None:
-        """
-        Retrieve the current logged user with the provided access token.
-
-        Args:
-            access_token (str | None): The current user access token.
-
-        Raises:
-            InvalidAccessTokenError: If the access token is invalid.
-
-        Returns:
-            User | None: User if the token is valid and the user exists, None otherwise.
-        """
         if access_token is None:
             return None
 
         try:
-            user_id = AccessToken().decode(token=access_token).subject
-
+            # ✅ Ara subject = username (text)
+            username = AccessToken().decode(token=access_token).subject
         except Exception as exception:
             raise InvalidAccessTokenError() from exception
 
+        # ✅ Abans buscava per id; ara per username
         conditions: list[Condition[DataModel]] = [
-            Condition[DataModel](field="id", operator=SQLOperation.EQUAL, value=user_id)
+            Condition[DataModel](field="username", operator=SQLOperation.EQUAL, value=username)
         ]
+
         users = self.__finder.find(conditions=conditions)
+
         if users and len(users) > 1:
             raise UserMustBeLoggedError()
         elif users:

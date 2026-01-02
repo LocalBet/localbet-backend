@@ -14,51 +14,58 @@ from backend.users.services import UserFinderService
 
 class UserLoginService:
     """
-    User login domain service.
+    User login domain service (simplified).
     """
 
     __actions: UserActions
     __user_finder: UserFinderService
 
     def __init__(self, actions: UserActions, finder: UserFinderService) -> None:
-        """
-        UserLogin constructor.
-
-        Args:
-            actions (UserActions): User actions.
-            finder (UserFinderService): User finder service.
-        """
         self.__actions = actions
         self.__user_finder = finder
 
-    def login(self, email: str, password: str) -> tuple[str, str]:
+    def login(self, username: str, password: str) -> tuple[str, str]:
         """
-        Login a user.
+        Login a user by username or email.
 
         Args:
-            email (str): User email.
+            username (str): User username or email.
             password (str): User password.
 
         Raises:
-            UserNotFoundError: If the provided email does not correspond to any user.
+            UserNotFoundError: If the provided username/email does not correspond to any user.
             PasswordVerificationError: If the provided password does not match with the user's password.
 
         Returns:
             tuple[str, str]: The access and refresh tokens.
         """
-        users: list[User] = self.__user_finder.find(
-            conditions=[
-                Condition(
-                    field="email",
-                    operator=SQLOperation.EQUAL,
-                    value=email,
+        # Try to find by username first
+        try:
+            users: list[User] = self.__user_finder.find(
+                conditions=[
+                    Condition(
+                        field="username",
+                        operator=SQLOperation.EQUAL,
+                        value=username,
+                    )
+                ]
+            )
+        except UserNotFoundError:
+            # If not found by username, try by email
+            try:
+                users: list[User] = self.__user_finder.find(
+                    conditions=[
+                        Condition(
+                            field="email",
+                            operator=SQLOperation.EQUAL,
+                            value=username,
+                        )
+                    ]
                 )
-            ]
-        )
-
-        if not users:
-            self.__avoid_timing_attack(password=password)
-            raise UserNotFoundError(field="email", value=email)
+            except UserNotFoundError:
+                # User not found by username or email
+                self.__avoid_timing_attack(password=password)
+                raise UserNotFoundError(field="username/email", value=username)
 
         if not users[0].check_password(plain_password=password):
             raise PasswordVerificationError()
@@ -67,15 +74,6 @@ class UserLoginService:
 
     def __avoid_timing_attack(self, password: str) -> None:
         """
-        This method is used to avoid timing attacks. This type of attack is where the attacker attempts to compromise a
-        system by analyzing the time taken to execute cryptographic algorithms. In this case, we are using a dummy
-        password hashing function, so even the user does not exist, the time taken to execute the hashing function will
-        be the same.
-
-        Args:
-            password (str): User password.
-
-        References:
-            https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#authentication-and-error-messages
+        Avoid timing attacks by doing a dummy hash even if user doesn't exist.
         """
         password_hashing(data=password)

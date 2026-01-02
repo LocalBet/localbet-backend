@@ -1,0 +1,23 @@
+"""
+Bet group_id value object.
+"""
+
+from uuid import UUID
+
+from backend.shared.models import ValueObject
+
+
+class BetGroupId(ValueObject[UUID]):
+    """
+    Bet group_id value object (FK to group table).
+    """
+
+    def _validate(self, value: str | UUID) -> None:
+        # UUID constructor will raise ValueError if invalid
+        if isinstance(value, str):
+            UUID(value)
+    
+    def _process(self, value: str | UUID) -> UUID:
+        if isinstance(value, str):
+            return UUID(value)
+        return value

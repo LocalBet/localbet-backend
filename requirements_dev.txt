@@ -22,3 +22,8 @@ pre-commit>=3.0.0,<5.0.0  # https://pre-commit.com
 
 # Test data generation
 Faker==37.12.0  # https://faker.readthedocs.io/en/master/
+
+# redis-py es el cliente oficial de Redis para Python, con soporte asíncrono.
+redis==5.0.1  # https://pypi.org/project/redis/
+
+psutil==7.1.3

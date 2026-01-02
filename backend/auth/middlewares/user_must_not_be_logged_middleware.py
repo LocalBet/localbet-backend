@@ -25,26 +25,10 @@ class UserMustNotBeLoggedMiddleware(BaseHTTPMiddleware):
     __finder: UserFinderService
 
     def __init__(self, app: ASGIApp) -> None:
-        """
-        UserMustNotBeLoggedMiddleware constructor.
-
-        Args:
-            app (ASGIApp): The ASGI app to call.
-        """
         super().__init__(app=app)
 
     @override
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        """
-        Middleware that checks if the user is not logged in.
-
-        Args:
-            request (Request): The request that the user is making.
-            call_next (RequestResponseEndpoint): The endpoint to call.
-
-        Raises:
-            UserMustNotBeLoggedError: If the user is logged in.
-        """
         with get_database_connection() as database_connection:
             action = PostgreSQLUserActions(connection=database_connection)
             self.__finder = UserFinderService(action=action)
@@ -60,26 +44,18 @@ class UserMustNotBeLoggedMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
     def __retrieve_user(self, access_token: str | None) -> User | None:
-        """
-        Retrieve the current logged user with the provided access token.
-
-        Args:
-            access_token (str | None): The current user access token.
-
-        Returns:
-            User | None: User if the token is valid and the user exists, None otherwise.
-        """
         if access_token is None:
             return None
 
         try:
-            user_id = AccessToken().decode(token=access_token).subject
-
+            # ✅ Ara subject = username
+            username = AccessToken().decode(token=access_token).subject
         except Exception:
             return None
 
+        # ✅ Abans buscava per id; ara per username
         conditions: list[Condition[DataModel]] = [
-            Condition[DataModel](field="id", operator=SQLOperation.EQUAL, value=user_id)
+            Condition[DataModel](field="username", operator=SQLOperation.EQUAL, value=username)
         ]
 
         users = self.__finder.find(conditions=conditions)

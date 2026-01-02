@@ -13,8 +13,12 @@ from backend.shared.infrastructure import MiddlewareWrapper
 from backend.shared.infrastructure.errors import HTTPError
 from backend.users.actions import PostgreSQLUserActions
 from backend.users.services import UserFinderService
+from backend.auth.models import RefreshToken
 
-route = APIRouter(route_class=MiddlewareWrapper(middlewares=[UserMustNotBeLoggedMiddleware]))
+from backend.services.redis import redis_client
+import time
+
+route = APIRouter()
 
 
 @route.post(
@@ -62,11 +66,18 @@ async def user_login(refresh_data: RefreshTokenSchema) -> AccessTokenSchema:
                 refresh_token=refresh_data.refresh_token
             )
 
+            username = RefreshToken().decode(token=old_refresh_token).subject
+
     except InvalidRefreshTokenError as exception:
         raise HTTPError(
             status_code=status.HTTP_401_UNAUTHORIZED,
             title="Unauthorized",
             message=exception.message,
         ) from exception
+
+    token_ttl = 300
+    expire_at = int(time.time()) + token_ttl
+
+    await redis_client.zadd("active_users", {username: expire_at})
 
     return AccessTokenSchema(access_token=new_access_token, refresh_token=old_refresh_token)

@@ -24,28 +24,17 @@ class PostgreSQLUserActions(UserActions):
     __connection: PostgreSqlConnection
 
     def __init__(self, connection: PostgreSqlConnection) -> None:
-        """
-        PostgreSQL User action constructor.
-
-        Args:
-            connection (PostgreSqlConnection): PostgreSQL connection.
-        """
         self.__connection = connection
 
     @override
     def search(self, conditions: list[Condition[DataModel]]) -> list[User]:
-        """
-        Search Users in the action by conditions.
-
-        Args:
-            conditions (list[Condition]): Conditions to search for.
-
-        Returns:
-            list[User]: List of users.
-        """
-        # Base query
         query: str = """
-            SELECT id, name, username, email, password, role_id, create_date, update_date
+            SELECT 
+                id, username, email, password, 
+                full_name, phone_number, birth_date, country,
+                coins, wins, losses, active_groups_count,
+                accepted_terms, accepted_privacy_policy, legal_verified, verified_at,
+                created_at, updated_at
             FROM "user"
             WHERE 1=1
         """
@@ -53,8 +42,9 @@ class PostgreSQLUserActions(UserActions):
         parameters: dict[str, Any] = {}
 
         for index, condition in enumerate(conditions):
-            query += f" AND {condition.field} {condition.operator} %(param_{index})s"
-            parameters[f"param_{index}"] = condition.value
+            # Dynamic WHERE clause construction
+            query += f' AND {condition.field} {condition.operator} %(param_{index})s'
+            parameters[f'param_{index}'] = condition.value
 
         results = self.__connection.search_all(query, parameters, User)
 
@@ -73,19 +63,26 @@ class PostgreSQLUserActions(UserActions):
             UserNotFoundError: If no User with the specified ID is found.
         """
         if not user.id:
-            raise ValueError("User ID is mandatory and cannot be None.")
+            raise ValueError('User ID is mandatory and cannot be None.')
 
-        users = self.search([Condition("id", SQLOperation.EQUAL, user.id)])
+        users = self.search([Condition('id', SQLOperation.EQUAL, user.id)])
         if not users:
-            raise UserNotFoundError(field="id", value=user.id)
+            raise UserNotFoundError(field='id', value=str(user.id))
 
         set_fragments: list[Composed] = []
-        for key, value in user.to_dict().items():
-            if value is not None and key != "id":
-                set_fragments.append(SQL("{} = {}").format(Identifier(key), Placeholder(key)))
+        user_dict = user.to_dict()
 
-        if not set_fragments:
-            raise ValueError("No valid fields to update were provided.")
+        valid_update_fields = {
+            'username', 'email', 'password', 'full_name', 'phone_number',
+            'birth_date', 'country', 'coins', 'wins', 'losses',
+            'active_groups_count', 'legal_verified', 'verified_at'
+        }
+
+        for key, value in user_dict.items():
+            if value is not None and key in valid_update_fields:
+                set_fragments.append(SQL('{} = {}').format(Identifier(key), Placeholder(key)))
+
+        set_fragments.append(SQL("updated_at = CURRENT_TIMESTAMP"))
 
         query: Composed = SQL(
             """
@@ -93,70 +90,79 @@ class PostgreSQLUserActions(UserActions):
             SET {set_clause}
             WHERE id = {id_placeholder}
             """
-        ).format(set_clause=SQL(", ").join(set_fragments), id_placeholder=Placeholder("id"))
+        ).format(set_clause=SQL(', ').join(set_fragments), id_placeholder=Placeholder('id'))
 
-        self.__connection.execute(query=query, parameters=user.to_dict())
+        self.__connection.execute(query=query, parameters=user_dict)
 
     @override
     def save(self, user: User) -> None:
         """
-        Create a User in the action.
-
-        Args:
-            user (User): User to be created.
-
-        Raises:
-            ValueError: If no valid fields are provided.
-            UserAlreadyExistsError: If the User already exists.
+        Create a User in the DB with all profile and legal fields.
         """
         try:
             if not user.to_dict():
-                raise ValueError("No valid fields to insert were provided.")
+                raise ValueError('No valid fields to insert were provided.')
 
+            # Insert with all new columns
             query: Composed = SQL(
                 """
                 INSERT INTO "user" (
-                    id, name, username, email, password, role_id, create_date, update_date
+                    id, username, email, password, 
+                    full_name, phone_number, birth_date, country,
+                    coins, wins, losses, active_groups_count, 
+                    accepted_terms, accepted_privacy_policy, legal_verified, verified_at,
+                    created_at, updated_at
                 )
                 VALUES (
-                    {id_placeholder}, {name_placeholder}, {username_placeholder},
-                    {email_placeholder}, {password_placeholder}, {role_id_placeholder}, {create_date_placeholder},
-                    {update_date_placeholder}
+                    {id}, {username}, {email}, {password}, 
+                    {full_name}, {phone_number}, {birth_date}, {country},
+                    {coins}, {wins}, {losses}, {active_groups_count},
+                    {accepted_terms}, {accepted_privacy_policy}, {legal_verified}, {verified_at},
+                    {created_at}, {updated_at}
                 )
-            """
-            ).format(
-                id_placeholder=Placeholder("id"),
-                name_placeholder=Placeholder("name"),
-                username_placeholder=Placeholder("username"),
-                email_placeholder=Placeholder("email"),
-                password_placeholder=Placeholder("password"),
-                role_id_placeholder=Placeholder("role_id"),
-                create_date_placeholder=Placeholder("create_date"),
-                update_date_placeholder=Placeholder("update_date"),
+            """).format(
+                id=Placeholder("id"),
+                username=Placeholder("username"),
+                email=Placeholder("email"),
+                password=Placeholder("password"),
+                full_name=Placeholder("full_name"),
+                phone_number=Placeholder("phone_number"),
+                birth_date=Placeholder("birth_date"),
+                country=Placeholder("country"),
+                coins=Placeholder("coins"),
+                wins=Placeholder("wins"),
+                losses=Placeholder("losses"),
+                active_groups_count=Placeholder("active_groups_count"),
+                accepted_terms=Placeholder("accepted_terms"),
+                accepted_privacy_policy=Placeholder("accepted_privacy_policy"),
+                legal_verified=Placeholder("legal_verified"),
+                verified_at=Placeholder("verified_at"),
+                created_at=Placeholder("created_at"),
+                updated_at=Placeholder("updated_at")
             )
 
-            self.__connection.execute(query=query, parameters=user.to_dict())
+            params = user.to_dict()
+            self.__connection.execute(query=query, parameters=params)
+
         except UniqueViolation as exception:
-            raise UserAlreadyExistsError(field="username", value=user.username) from exception
+            msg = str(exception)
+            field = 'email' if 'email' in msg else 'username'
+            value = user.email if field == 'email' else user.username
+            raise UserAlreadyExistsError(field=field, value=str(value)) from exception
 
     @override
     def delete(self, user: User) -> None:
         """
-        Delete a User from the action.
-
-        Args:
-            user (User): User to delete.
-
-        Raises:
-            UserNotFoundError: If the User is not found.
+        Delete a User from the DB (by username).
         """
         try:
             query: Composed = SQL(
                 """
                 DELETE FROM "user"
                 WHERE id = {id_placeholder}
-            """
-            ).format(id_placeholder=Placeholder("id"))
-            self.__connection.execute(query=query, parameters=user.to_dict())
+            """).format(id_placeholder=Placeholder('id'))
+
+            self.__connection.execute(query=query, parameters={'id': str(user.id)})
+
         except NoRowAffectedError as exception:
-            raise UserNotFoundError(field="id", value=user.id) from exception
+            raise UserNotFoundError(field='id', value=str(user.id)) from exception
