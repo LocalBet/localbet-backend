@@ -9,3 +9,4 @@ app.conf
 **pycache**
 **logs**
 **.coverage**
+**.idea**
