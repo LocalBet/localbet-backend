@@ -105,6 +105,23 @@ class PostgreSqlConnection:
 
         return [model.from_dict(primitives=primitives) for primitives in result]
 
+    def count(self, query: SQL | Composed, parameters: dict[str, Any]) -> int:
+     """
+     Execute a COUNT query and return the integer result.
+
+     Args:
+         query (SQL | Composed): SQL COUNT(*) query expected to return a numeric field.
+         parameters (dict[str, Any]): Parameters to inject into the query.
+
+     Returns:
+         int: The count returned by the query.
+      """
+     result = self.__connection.execute(sql.SQL(query), params=parameters).fetchone() # type: ignore[assignment]
+     if result is None:
+        return 0
+     # Extract the first value, expected to be COUNT(*)
+     return int(next(iter(result.values())))
+
     def execute(self, query: SQL | Composed, parameters: dict[str, Any]) -> Any:
         """
         Execute a query with the given parameters.

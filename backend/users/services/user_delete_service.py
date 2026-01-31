@@ -33,7 +33,6 @@ class UserDeleterService:
             UserNotFoundError: If user was not found.
         """
         self.__ensure_user_password_matches(user=user, password=password)
-
         self.__action.delete(user=user)
 
     def __ensure_user_password_matches(self, user: User, password: str) -> None:

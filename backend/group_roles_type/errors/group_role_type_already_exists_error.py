@@ -1,0 +1,50 @@
+"""
+GroupRoleTypeAlreadyExistsError module.
+"""
+
+from typing import Any
+
+from backend.shared.errors import DomainBaseError
+
+
+class GroupRoleTypeAlreadyExistsError(DomainBaseError):
+    """
+    GroupRoleTypeAlreadyExistsError class.
+    """
+
+    __field: str
+    __value: Any
+
+    def __init__(self, *, field: str, value: Any) -> None:
+        """
+        GroupRoleTypeAlreadyExistsError constructor.
+
+        Args:
+            field (str): Name of the field that caused the conflict (e.g., 'name').
+            value (Any): Value of the field that caused the conflict, it must be stringifyable.
+        """
+        self.__field = field
+        self.__value = value
+
+        message = f"GroupRoleType with <<<{field}>>> <<<{value}>>> already exists."
+        super().__init__(message=message)
+
+    @property
+    def field(self) -> str:
+        """
+        Returns the field name that caused the conflict.
+
+        Returns:
+            str: The field name.
+        """
+        return self.__field
+
+    @property
+    def value(self) -> Any:
+        """
+        Returns the field value that caused the conflict.
+
+        Returns:
+            Any: The field value.
+        """
+        return self.__value

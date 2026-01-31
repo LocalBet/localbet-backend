@@ -51,16 +51,9 @@ class UserUpdateService:
             new_password=new_password,
             new_password_confirmation=new_password_confirmation,
         ):
-            self.__ensure_passwords_match(
-                password=new_password,  # type: ignore[arg-type]
-                password_verification=new_password_confirmation,  # type: ignore[arg-type]
-            )
-            self.__ensure_user_password_matches(
-                user=user,
-                password=old_password,  # type: ignore[arg-type]
-            )
-
-        server_hash = hash(user)
+            self.__ensure_passwords_match(password=new_password, password_verification=new_password_confirmation)  # type: ignore[arg-type]
+            self.__ensure_user_password_matches(user=user, password=old_password)  # type: ignore[arg-type]
+        user_hash = hash(user)
 
         if username is not None:
             user.username = username
@@ -73,8 +66,13 @@ class UserUpdateService:
             if not user.check_password(plain_password=new_password):
                 user.password = new_password
 
-        # If no changes, do nothing
-        if hash(user) == server_hash:
+        if role_id is not None:
+            self.__ensure_role_id_exists(
+                role_id=role_id
+            )  # TODO: Use the finder service of Role when it is implemented and raise RoleNotFoundError if not found
+            user.role_id = role_id
+
+        if hash(user) == user_hash:
             return
 
         self.__action.update(user=user)
